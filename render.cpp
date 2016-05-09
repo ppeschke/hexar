@@ -1,4 +1,18 @@
-#include "global.h"
+#include "game.h"
+
+// Direct3D.cpp
+void StartRender();
+void EndRender();
+void drawText(const char* text);
+void LoadModel(MODEL* Model, LPCTSTR File, int modelNum);
+void SetCamera();
+void AdjustCamera(float x, float y, float z);
+void InitLight();
+void DrawModel(MODEL* Model, float x, float y, float z, float scale, float rotation, color c);
+
+//render.cpp
+void Render(Game* thegame);
+void LoadGraphics(Game* thegame);
 
 void LoadGraphics(Game* thegame)
 {
@@ -24,7 +38,7 @@ void LoadGraphics(Game* thegame)
     return;
 }
 
-void Render(Game* thegame, client* Client)
+void Render(Game* thegame)
 {
     StartRender();
 

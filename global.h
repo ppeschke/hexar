@@ -1,32 +1,22 @@
 // header files
-#include <windows.h>
-#include <windowsx.h>
-#include <d3d9.h>
-#include <d3dx9.h>
-#include <dinput.h>
-#include <atlbase.h>
-#include <stdlib.h>
-#include "gamewindow.h"
-#include "object.h"
+//#include <atlbase.h>
+//#include <stdlib.h>
+/*#include "object.h"
 #include "inputdata.h"
 #include "game.h"
 #include "hexagon.h"
 #include "rotator.h"
-#include "client.h"
+#include "NetworkClient.h"
 #include "action.h"
 
 // libraries
 #pragma comment (lib, "d3d9.lib")
 #pragma comment (lib, "d3dx9.lib")
-//#pragma comment (lib, "dinput.lib")
 #pragma comment (lib, "dinput8.lib")
 #pragma comment (lib, "dxguid.lib")
 
 // prototypes for...
 // WinMain.cpp
-LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-void DisplayWindow(GAMEWINDOW* gw, HINSTANCE hInstance, int nCmdShow);
-bool HandleMessages();
 
 // Loop.cpp
 void MainLoop(const char* ServerAddress);
@@ -61,3 +51,4 @@ void MenuLogic(Game* thegame, INPUTDATA* InputData, client* Client);
 
 // Input.cpp
 void Input(INPUTDATA* InputData);
+*/

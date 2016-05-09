@@ -1,10 +1,25 @@
-#include "global.h"
+#include <atlbase.h>
+#include <stdlib.h>
+#include "gamewindow.h"
+#include "model.h"
+#include "color.h"
 
 LPDIRECT3D9 d3d = NULL;
 LPDIRECT3DDEVICE9 d3ddev = NULL;
 D3DPRESENT_PARAMETERS d3dpp;
 LPD3DXSPRITE d3dspt;
 LPD3DXFONT dxfont;
+
+//direct3d.cpp prototypes
+void InitDirect3D(GAMEWINDOW* gw);
+void CloseDirect3D();
+void StartRender();
+void EndRender();
+void LoadModel(MODEL* Model, LPCTSTR File, int modelNum);
+void SetCamera();
+void AdjustCamera(float x, float y, float z);
+void DrawModel(MODEL* Model, float x, float y, float z, float scale, float rotation, color c);
+void InitLight();
 
 // Create Direct3D and the Direct3D Device
 void InitDirect3D(GAMEWINDOW* gw)

@@ -1,3 +1,7 @@
+#include <d3d9.h>
+#include <d3dx9.h>
+using namespace std;
+
 class MODEL
 {
 public:

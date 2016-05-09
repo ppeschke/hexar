@@ -1,11 +1,23 @@
-#include "global.h"
 #include <cmath>
+#include <fstream>
+using namespace std;
+
+#include "action.h"
+#include "game.h"
+#include "hexagon.h"
+#include "rotator.h"
+#include "inputdata.h"
+#include "NetworkClient.h"
+
+//direct3d.cpp prototypes
+void AdjustCamera(float x, float y, float z);
 
 // global variables
 float camXAngle;
 float camYAngle;
 float camZoom;
 const float PI = 3.14159f;
+ofstream debugFile("debug.txt");
 
 action parseMessage(Game* thegame, string buffer);
 void doAction(Game* thegame, action);
@@ -120,7 +132,7 @@ float randomNumber(float low, float high)
 	return low + ((float)rand() / (float)RAND_MAX) * (high - low);
 }
 
-void Logic(Game* thegame, INPUTDATA* InputData, client* Client)
+void Logic(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 {
 	int i, p;
 	static base* hover = NULL;
@@ -268,7 +280,7 @@ void Logic(Game* thegame, INPUTDATA* InputData, client* Client)
     return;
 }
 
-void MenuLogic(Game* thegame, INPUTDATA* InputData, client* Client)
+void MenuLogic(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 {
 	int i, p;
 	static base* hover = NULL;
@@ -277,8 +289,11 @@ void MenuLogic(Game* thegame, INPUTDATA* InputData, client* Client)
 
 	action tempAction;
 	if(Client->hasMessage())
+	{
 		tempAction = parseMessage(thegame, Client->getAMessage());
+		debugFile << "tempAction: " << tempAction.item << ", " << tempAction.name << endl;
 		doAction(thegame, tempAction);
+	}
 	thegame->arrow->onStep();
 
 	if(InputData->Esc)
@@ -338,7 +353,7 @@ void MenuLogic(Game* thegame, INPUTDATA* InputData, client* Client)
 				sel1 = getHexagon(thegame, i, p);
 				string colors[] = {"white", "red", "green", "blue", "yellow", "orange", "cyan"};
 				string msg = "_request " + colors[p + 1];
-				Client->send(msg.c_str());
+				Client->Send(msg.c_str());
 			}
 		}
 	}

@@ -1,9 +1,7 @@
 #pragma once
-#include <d3d9.h>
-#include <d3dx9.h>
 #include "model.h"
 
-enum color {white, red, green, blue, yellow, orange, cyan};
+#include "color.h"
 
 class base
 {

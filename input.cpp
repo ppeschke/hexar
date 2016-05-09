@@ -1,4 +1,10 @@
-#include "global.h"
+#define DIRECTINPUT_VERSION 0x0800
+#include <dinput.h>
+
+#include "inputdata.h"
+
+void GetKeys(BYTE* KeyState);
+void GetMouse(DIMOUSESTATE* MouseState);
 
 void Input(INPUTDATA* InputData)
 {

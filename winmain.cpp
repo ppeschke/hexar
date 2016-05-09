@@ -1,4 +1,13 @@
-#include "global.h"
+#include "gamewindow.h"
+
+LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+void DisplayWindow(GAMEWINDOW* gw, HINSTANCE hInstance, int nCmdShow);
+bool HandleMessages();
+void InitDirect3D(GAMEWINDOW* gw);
+void CloseDirect3D();
+void InitDirectInput(HINSTANCE hInstance, GAMEWINDOW* gw);
+void CloseDirectInput(void);
+void MainLoop(const char* ServerAddress);
 
 // Starting Point
 int WINAPI WinMain(HINSTANCE hInstance,
