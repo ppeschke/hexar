@@ -1,4 +1,5 @@
 #include "base.h"
+#include "model.h"
 
 base::base(float _x, float _y, float _z, float _s, color _c, MODEL* _m)
 {

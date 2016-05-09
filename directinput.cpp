@@ -4,6 +4,9 @@
 #endif
 #include <dinput.h>
 
+#pragma comment (lib, "dxguid.lib")
+#pragma comment (lib, "dinput8.lib")
+
 LPDIRECTINPUT8 din;
 LPDIRECTINPUTDEVICE8 dinkeyboard;
 LPDIRECTINPUTDEVICE8 dinmouse;

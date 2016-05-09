@@ -1,4 +1,5 @@
 #include "game.h"
+#include "model.h"
 
 // Direct3D.cpp
 void StartRender();

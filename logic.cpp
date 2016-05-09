@@ -8,6 +8,7 @@ using namespace std;
 #include "rotator.h"
 #include "inputdata.h"
 #include "NetworkClient.h"
+#include "model.h"
 
 //direct3d.cpp prototypes
 void AdjustCamera(float x, float y, float z);
@@ -288,12 +289,15 @@ void MenuLogic(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
     // for every millisecond...
 
 	action tempAction;
-	if(Client->hasMessage())
+	Client->locker.lock();
+	if(Client->messages.size() > 0)
 	{
-		tempAction = parseMessage(thegame, Client->getAMessage());
+		tempAction = parseMessage(thegame, *(Client->messages.begin()));
+		Client->messages.pop_front();
 		debugFile << "tempAction: " << tempAction.item << ", " << tempAction.name << endl;
 		doAction(thegame, tempAction);
 	}
+	Client->locker.unlock();
 	thegame->arrow->onStep();
 
 	if(InputData->Esc)

@@ -1,4 +1,5 @@
 #include "game.h"
+#include "model.h"
 
 Game::Game(void)
 {

@@ -21,6 +21,11 @@ void AdjustCamera(float x, float y, float z);
 void DrawModel(MODEL* Model, float x, float y, float z, float scale, float rotation, color c);
 void InitLight();
 
+// include the Direct3D Library files so you don't have to put them in the project settings
+//(the paths to these do have to be included in the lib directories for the compiler though)
+#pragma comment (lib, "d3d9.lib")
+#pragma comment (lib, "d3dx9.lib")
+
 // Create Direct3D and the Direct3D Device
 void InitDirect3D(GAMEWINDOW* gw)
 {

@@ -1,5 +1,5 @@
 #pragma once
-#include "model.h"
+class MODEL;
 
 #include "color.h"
 
