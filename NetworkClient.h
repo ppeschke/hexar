@@ -12,7 +12,7 @@ DWORD WINAPI RecvThread(LPVOID Whatever);
 class NetworkClient
 {
 public:
-	NetworkClient();
+	NetworkClient(const char* serverAddress);
 	~NetworkClient();
 
 	void Listen();

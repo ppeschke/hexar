@@ -15,8 +15,7 @@ void MainLoop(const char* ServerAddress)
 {
 	Game thegame;
 	INPUTDATA InputData;
-	NetworkClient Client;
-	Client.Listen();
+	NetworkClient Client(ServerAddress);
 	LoadGraphics(&thegame);
 	MainMenu(&thegame);			//displays a list of colored tiles for the use to pick their color
 	while(!thegame.setup && !thegame.over && HandleMessages())
