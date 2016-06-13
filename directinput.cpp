@@ -26,8 +26,8 @@ void InitDirectInput(HINSTANCE hInstance, GAMEWINDOW* gw)
     dinkeyboard->SetDataFormat(&c_dfDIKeyboard);
     dinmouse->SetDataFormat(&c_dfDIMouse);
 
-    dinkeyboard->SetCooperativeLevel(gw->hWnd, DISCL_NONEXCLUSIVE | DISCL_BACKGROUND);
-    dinmouse->SetCooperativeLevel(gw->hWnd, DISCL_NONEXCLUSIVE | DISCL_BACKGROUND);
+    dinkeyboard->SetCooperativeLevel(gw->hWnd, DISCL_EXCLUSIVE | DISCL_FOREGROUND);
+    dinmouse->SetCooperativeLevel(gw->hWnd, DISCL_EXCLUSIVE | DISCL_FOREGROUND);
 
     dinmouse->Acquire();
 
