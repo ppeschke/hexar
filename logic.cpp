@@ -286,7 +286,6 @@ void MenuLogic(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 	int i, p;
 	static base* hover = NULL;
 	base* sel1 = NULL;
-    // for every millisecond...
 
 	action tempAction;
 	Client->locker.lock();

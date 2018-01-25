@@ -25,7 +25,9 @@ NetworkClient::NetworkClient(const char* serverAddress)
 	ZeroMemory(&ServerAddress, SizeInt);
 	ServerAddress.sin_family = AF_INET;
 	ServerAddress.sin_addr.s_addr = inet_addr(serverIP);
-	ServerAddress.sin_port = port;
+	u_short IpnetShort;
+	WSAHtons(Socket, port, &IpnetShort);
+	ServerAddress.sin_port = IpnetShort;
 
 	ListenThreadHandle = CreateThread(NULL, 0, RecvThread, this, 0, NULL);
 	Knock();
@@ -43,12 +45,12 @@ void NetworkClient::Knock()
 	sendBuffer[0] = 1;
 	sendBuffer[255] = '\0';
 	Send(sendBuffer);
-	//sendto(Socket, sendBuffer, 1, 0, (sockaddr*)&ServerAddress, sizeof(sockaddr));
 }
 
 NetworkClient::~NetworkClient()
 {
 	running = false;
+	Leave();
 	fout.close();
 	WaitForSingleObject(ListenThreadHandle, INFINITE);	//wait for the listen thread to finish
 	WSACleanup();
@@ -56,7 +58,7 @@ NetworkClient::~NetworkClient()
 
 void NetworkClient::Leave()
 {
-	sendBuffer[0] = 0;
+	sendBuffer[0] = '\0';
 	sendto(Socket, sendBuffer, 1, 0, (sockaddr*)&ServerAddress, sizeof(sockaddr));
 	running = false;
 }
