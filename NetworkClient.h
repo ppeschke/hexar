@@ -18,6 +18,7 @@ public:
 	void Listen();
 	void Knock();
 	void Send(const char* message);
+	bool Connected();
 	void Leave();
 
 	mutex locker;
@@ -31,7 +32,8 @@ public:
 	char recvBuffer[256];
 	char sendBuffer[256];
 	volatile bool running;
-	list<char*> messages;
+	list<string> messages;
+	volatile bool connected;
 };
 
 #endif

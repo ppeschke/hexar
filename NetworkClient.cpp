@@ -29,6 +29,7 @@ NetworkClient::NetworkClient(const char* serverAddress)
 	WSAHtons(Socket, port, &IpnetShort);
 	ServerAddress.sin_port = IpnetShort;
 
+	connected = false;
 	ListenThreadHandle = CreateThread(NULL, 0, RecvThread, this, 0, NULL);
 	Knock();
 }
@@ -45,6 +46,11 @@ void NetworkClient::Knock()
 	sendBuffer[0] = 1;
 	sendBuffer[255] = '\0';
 	Send(sendBuffer);
+}
+
+bool NetworkClient::Connected()
+{
+	return connected;
 }
 
 NetworkClient::~NetworkClient()
@@ -72,8 +78,17 @@ void NetworkClient::Listen()
 		if(ServerAddress.sin_addr.s_addr == IncomingAddress.sin_addr.s_addr)	//if it comes from the server
 		{
 			recvBuffer[255] = '\0';
+			fout << recvBuffer << endl;
 			if(recvBuffer[0] == 0)	//server kick or leave acknowledgement
+			{
+				connected = false;
 				break;
+			}
+			else if(recvBuffer[0] == 1)
+			{
+				connected = true;
+				continue;
+			}
 			locker.lock();
 			messages.insert(messages.end(), recvBuffer);
 			locker.unlock();

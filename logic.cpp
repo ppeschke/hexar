@@ -9,6 +9,7 @@ using namespace std;
 #include "inputdata.h"
 #include "NetworkClient.h"
 #include "model.h"
+#include "outpost.h"
 
 //direct3d.cpp prototypes
 void AdjustCamera(float x, float y, float z);
@@ -115,7 +116,6 @@ void InitGame(Game* thegame, int playerNum, int rings)
 		{
 			temp = new hexagon(x, 0.0f, rz, 1.0f, white, GetModel(thegame, 1), i, p);
 			thegame->objects.insert(thegame->objects.end(), temp);
-			//Render(thegame);
 			x -= 2.5;
 		}
 		count += (i + 1 < rings ? 1 : -1);
@@ -137,7 +137,7 @@ void Logic(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 {
 	int i, p;
 	static base* hover = NULL;
-    // for every millisecond...
+    // for every frame...
 	thegame->arrow->onStep();
 
 	if(InputData->Esc)
@@ -278,6 +278,10 @@ void Logic(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 	if(thegame->buttonTimer > 0)
 		thegame->buttonTimer -= 1;
 
+	for(list<base*>::iterator index = thegame->objects.begin(); index != thegame->objects.end(); ++index)
+	{
+		(*index)->onStep();
+	}
     return;
 }
 
@@ -412,6 +416,7 @@ action parseMessage(Game* thegame, string b)
 		index = index2;
 		index2 = b.find(" ", index + 1);
 		a.int2 = atoi(b.substr(index, index2 - index - 1).c_str());
+		a.int3 = atoi(b.substr(index2).c_str());
 	}
 	else if(a.name == "_endturn")
 	{}
@@ -455,10 +460,20 @@ void doAction(Game* thegame, action tempAction)
 		if(temp)
 			temp->c = (color)tempAction.int3;
 	}
+	else if(tempAction.name == "_buy")
+	{
+		if(tempAction.item == "base")
+		{
+			base* hex = getHexagon(thegame, tempAction.int1, tempAction.int2);
+			base* temp = new outpost(hex->x, hex->y + 1.0f, hex->z, 0.3f, (color)tempAction.int3, GetModel(thegame, 2), hex->i, hex->p);
+			thegame->objects.insert(thegame->objects.end(), temp);
+		}
+	}
 	else if(tempAction.name == "_setup")
 	{
 		thegame->CleanObjs();
 		InitGame(thegame, tempAction.int1, tempAction.int2);
-		thegame->setup = true;
 	}
+	else if(tempAction.name == "_play")
+		thegame->setup = true;
 }
