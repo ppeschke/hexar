@@ -10,6 +10,7 @@ using namespace std;
 #include "NetworkClient.h"
 #include "model.h"
 #include "outpost.h"
+#include "turret.h"
 
 //direct3d.cpp prototypes
 void AdjustCamera(float x, float y, float z);
@@ -38,10 +39,20 @@ base* getHexagon(Game* thegame, int i, int p)
 {
 	for(list<base*>::iterator index = thegame->objects.begin(); index != thegame->objects.end(); ++index)
 	{
-		if((*index)->coords(i, p))
+		if((*index)->coords(i, p) && typeid(hexagon) == typeid(**index))
 			return (*index);
 	}
-	return NULL;
+	return nullptr;
+}
+
+base* getItem(Game* thegame, int i, int p)
+{
+	for(list<base*>::iterator index = thegame->objects.begin(); index != thegame->objects.end(); ++index)
+	{
+		if((*index)->coords(i, p) && typeid(hexagon) != typeid(**index))
+			return (*index);
+	}
+	return nullptr;
 }
 
 float distance(float x1, float y1, float x2, float y2)
@@ -139,6 +150,20 @@ void Logic(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 	static base* hover = NULL;
     // for every frame...
 	thegame->arrow->onStep();
+	Client->locker.lock();
+	if(Client->messages.size() > 0)
+	{
+		list<string>::iterator msg = Client->messages.begin();
+		if((*msg)[0] == '_')
+		{
+			action a = parseMessage(thegame, *msg);
+			doAction(thegame, a);
+		}
+		else
+			thegame->msg = (*msg);
+		Client->messages.pop_front();
+	}
+	Client->locker.unlock();
 
 	if(InputData->Esc)
 		thegame->over = true;
@@ -272,6 +297,49 @@ void Logic(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 	if(thegame->sel1)
 		thegame->sel1->y = 2.0f;
 
+	if(thegame->sel1 && thegame->command != ' ')
+	{
+		string sendString = "";
+		switch(thegame->command)
+		{
+		case ' ':
+			sendString = "_endturn";
+			break;
+		case 'G':
+			sendString = "_grab ";
+			break;
+		case 'M':
+			sendString = "_move ";
+			break;
+		case 'B':
+			sendString = "_buy base ";
+			break;
+		case 'W':
+			sendString = "_buy walker ";
+			break;
+		case 'T':
+			sendString = "_buy turret ";
+			break;
+		default:
+			thegame->msg = "Unsupported command!";
+		}
+		if(thegame->command != ' ')
+		{
+			sendString += thegame->sel1->i + 48;
+			sendString += ' ';
+			sendString += thegame->sel1->p + 48;
+		}
+		if(thegame->command == 'M')
+		{
+			sendString += ' ';
+			sendString += thegame->sel2->i + 48;
+			sendString += ' ';
+			sendString += thegame->sel2->p + 48;
+		}
+		Client->Send(sendString.c_str());
+		thegame->command = ' ';
+	}
+
 	AdjustCamera((float)cos((double)camXAngle) * camZoom * (float)cos((double)camYAngle),
 				 (float)sin((double)camYAngle) * camZoom,
 				 (float)sin((double)camXAngle) * camZoom * (float)cos((double)camYAngle));
@@ -385,26 +453,26 @@ action parseMessage(Game* thegame, string b)
 	if(a.name == "_grab")
 	{
 		index2 = b.find(" ", index + 1);
-		a.int1 = atoi(b.substr(index, index2 - index - 1).c_str());
+		a.int1 = atoi(b.substr(index + 1, index2 - index - 1).c_str());
 		index = index2;
 		index2 = b.find(" ", index + 1);
-		a.int2 = atoi(b.substr(index, index2 - index - 1).c_str());
+		a.int2 = atoi(b.substr(index + 1, index2 - index - 1).c_str());
 		index = index2;
-		a.int3 = atoi(b.substr(index).c_str());
+		a.int3 = atoi(b.substr(index+1).c_str());
 		
 	}
 	else if(a.name == "_move")
 	{
 		index2 = b.find(" ", index + 1);
-		a.int1 = atoi(b.substr(index, index2 - index - 1).c_str());
+		a.int1 = atoi(b.substr(index+1, index2 - index - 1).c_str());
 		index = index2;
 		index2 = b.find(" ", index + 1);
-		a.int2 = atoi(b.substr(index, index2 - index - 1).c_str());
+		a.int2 = atoi(b.substr(index+1, index2 - index - 1).c_str());
 		index = index2;
 		index2 = b.find(" ", index + 1);
-		a.int3 = atoi(b.substr(index, index2 - index - 1).c_str());
+		a.int3 = atoi(b.substr(index+1, index2 - index - 1).c_str());
 		index = index2;
-		a.int4 = atoi(b.substr(index).c_str());
+		a.int4 = atoi(b.substr(index+1).c_str());
 	}
 	else if(a.name == "_buy")
 	{
@@ -412,11 +480,11 @@ action parseMessage(Game* thegame, string b)
 		a.item = b.substr(index + 1, index2 - index - 1);
 		index = index2;
 		index2 = b.find(" ", index + 1);
-		a.int1 = atoi(b.substr(index, index2 - index - 1).c_str());
+		a.int1 = atoi(b.substr(index+1, index2 - index - 1).c_str());
 		index = index2;
 		index2 = b.find(" ", index + 1);
-		a.int2 = atoi(b.substr(index, index2 - index - 1).c_str());
-		a.int3 = atoi(b.substr(index2).c_str());
+		a.int2 = atoi(b.substr(index+1, index2 - index - 1).c_str());
+		a.int3 = atoi(b.substr(index2+1).c_str());
 	}
 	else if(a.name == "_endturn")
 	{}
@@ -431,10 +499,14 @@ action parseMessage(Game* thegame, string b)
 	else if(a.name == "_setup")
 	{
 		index2 = b.find(" ", index + 1);
-		a.int1 = atoi(b.substr(index, index2 - index - 1).c_str());
+		a.int1 = atoi(b.substr(index+1, index2 - index - 1).c_str());
 		index = index2;
 		index2 = b.find(" ", index + 1);
-		a.int2 = atoi(b.substr(index, index2 - index - 1).c_str());
+		a.int2 = atoi(b.substr(index+1, index2 - index - 1).c_str());
+	}
+	else if(a.name == "_peschkes")
+	{
+		a.int1 = atoi(b.substr(index).c_str());
 	}
 	return a;
 }

@@ -37,7 +37,9 @@ NetworkClient::NetworkClient(const char* serverAddress)
 void NetworkClient::Send(const char* message)
 {
 	fout << "Sending: " << message << endl;
-	sendto(Socket, message, 256, 0, (sockaddr*)&ServerAddress, sizeof(sockaddr));
+	strcpy_s(sendBuffer, message);
+	sendBuffer[255] = '\0';
+	sendto(Socket, sendBuffer, 256, 0, (sockaddr*)&ServerAddress, sizeof(sockaddr));
 }
 
 void NetworkClient::Knock()
