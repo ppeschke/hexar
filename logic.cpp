@@ -238,7 +238,7 @@ void Logic(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 			thegame->sel2->y = 0.0f;
 		thegame->sel1 = NULL;
 		thegame->sel2 = NULL;
-		thegame->command = ' ';
+		thegame->command = 'E';
 		thegame->buttonTimer = 10;
 	}
 
@@ -297,47 +297,52 @@ void Logic(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 	if(thegame->sel1)
 		thegame->sel1->y = 2.0f;
 
-	if(thegame->sel1 && thegame->command != ' ')
+	if(thegame->command != ' ')
 	{
-		string sendString = "";
-		switch(thegame->command)
+		if(thegame->sel1)
 		{
-		case ' ':
-			sendString = "_endturn";
-			break;
-		case 'G':
-			sendString = "_grab ";
-			break;
-		case 'M':
-			sendString = "_move ";
-			break;
-		case 'B':
-			sendString = "_buy base ";
-			break;
-		case 'W':
-			sendString = "_buy walker ";
-			break;
-		case 'T':
-			sendString = "_buy turret ";
-			break;
-		default:
-			thegame->msg = "Unsupported command!";
+			string sendString = "";
+			switch(thegame->command)
+			{
+			case 'G':
+				sendString = "_grab ";
+				break;
+			case 'M':
+				sendString = "_move ";
+				break;
+			case 'B':
+				sendString = "_buy base ";
+				break;
+			case 'W':
+				sendString = "_buy walker ";
+				break;
+			case 'T':
+				sendString = "_buy turret ";
+				break;
+			default:
+				thegame->msg = "Unsupported command!";
+			}
+			if(thegame->command != ' ')
+			{
+				sendString += thegame->sel1->i + 48;
+				sendString += ' ';
+				sendString += thegame->sel1->p + 48;
+			}
+			if(thegame->command == 'M')
+			{
+				sendString += ' ';
+				sendString += thegame->sel2->i + 48;
+				sendString += ' ';
+				sendString += thegame->sel2->p + 48;
+			}
+			Client->Send(sendString.c_str());
+			thegame->command = ' ';
 		}
-		if(thegame->command != ' ')
+		else if(thegame->command == 'E')
 		{
-			sendString += thegame->sel1->i + 48;
-			sendString += ' ';
-			sendString += thegame->sel1->p + 48;
+			Client->Send("_endturn");
+			thegame->command = ' ';
 		}
-		if(thegame->command == 'M')
-		{
-			sendString += ' ';
-			sendString += thegame->sel2->i + 48;
-			sendString += ' ';
-			sendString += thegame->sel2->p + 48;
-		}
-		Client->Send(sendString.c_str());
-		thegame->command = ' ';
 	}
 
 	AdjustCamera((float)cos((double)camXAngle) * camZoom * (float)cos((double)camYAngle),
@@ -419,17 +424,14 @@ void MenuLogic(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 	}
 
 	if(InputData->MouseButton && !thegame->buttonTimer)
-	{
-		if(thegame->buttonTimer == 0)
+	{	
+		thegame->buttonTimer = 10;
+		if(getSelected(thegame, i, p))
 		{
-			thegame->buttonTimer = 10;
-			if(getSelected(thegame, i, p))
-			{
-				sel1 = getHexagon(thegame, i, p);
-				string colors[] = {"white", "red", "green", "blue", "yellow", "orange", "cyan"};
-				string msg = "_request " + colors[p + 1];
-				Client->Send(msg.c_str());
-			}
+			sel1 = getHexagon(thegame, i, p);
+			string colors[] = {"white", "red", "green", "blue", "yellow", "orange", "cyan"};
+			string msg = "_request " + colors[p + 1];
+			Client->Send(msg.c_str());
 		}
 	}
 	if(sel1)
@@ -487,7 +489,8 @@ action parseMessage(Game* thegame, string b)
 		a.int3 = atoi(b.substr(index2+1).c_str());
 	}
 	else if(a.name == "_endturn")
-	{}
+	{
+	}
 	else if(a.name == "_granted")
 	{
 		a.item = b.substr(index + 1);
