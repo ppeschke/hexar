@@ -540,8 +540,19 @@ void doAction(Game* thegame, action tempAction)
 		if(tempAction.item == "base")
 		{
 			base* hex = getHexagon(thegame, tempAction.int1, tempAction.int2);
-			base* temp = new outpost(hex->x, hex->y + 1.0f, hex->z, 0.3f, (color)tempAction.int3, GetModel(thegame, 2), hex->i, hex->p);
+			base* temp = new outpost(hex->x, hex->y + 1.0f, hex->z, 0.3f, (color)tempAction.int3, GetModel(thegame, 2), tempAction.int1, tempAction.int2);
 			thegame->objects.insert(thegame->objects.end(), temp);
+		}
+		else if(tempAction.item == "walker")
+		{
+			base* hex = getHexagon(thegame, tempAction.int1, tempAction.int2);
+			base* temp = new rotator(hex->x, hex->y + 1.0f, hex->z, 0.3f, (color)tempAction.int3, GetModel(thegame, 4), tempAction.int1, tempAction.int2);
+			thegame->objects.insert(thegame->objects.end(), temp);
+		}
+		else if(tempAction.item == "turret")
+		{
+			base* hex = getHexagon(thegame, tempAction.int1, tempAction.int2);
+			base* temp = new rotator(hex->x, hex->y + 1.0f, hex->z, 0.3f, (color)tempAction.int3, GetModel(thegame, 3), tempAction.int1, tempAction.int2);
 		}
 	}
 	else if(tempAction.name == "_setup")
@@ -551,4 +562,6 @@ void doAction(Game* thegame, action tempAction)
 	}
 	else if(tempAction.name == "_play")
 		thegame->setup = true;
+	else if(tempAction.name == "peschkes")
+		thegame->msg = "peschkes: " + tempAction.int1;
 }
