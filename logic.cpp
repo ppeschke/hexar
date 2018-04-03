@@ -24,6 +24,7 @@ ofstream debugFile("debug.txt");
 
 action parseMessage(Game* thegame, string buffer);
 void doAction(Game* thegame, action);
+string toString(int i);
 
 MODEL* GetModel(Game* thegame, int modelNum)
 {
@@ -65,7 +66,7 @@ bool nextTo(base* a, base* b)
 	return distance(a->x, a->z, b->x, b->z) < 3.0f;
 }
 
-bool getSelected(Game* thegame, int& i, int& p)
+bool getHovered(Game* thegame, int& i, int& p)
 {
 	list<base*> close;
 	bool found = false;
@@ -262,7 +263,7 @@ void Logic(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 	thegame->arrow->z += InputData->MouseY / 20.0f;
 
 	base* hovtemp = hover;
-	if(getSelected(thegame, i, p))
+	if(getHovered(thegame, i, p))
 	{
 		if(hover = getHexagon(thegame, i, p))
 		{
@@ -283,7 +284,7 @@ void Logic(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 		if(thegame->buttonTimer == 0)
 		{
 			thegame->buttonTimer = 10;
-			if(getSelected(thegame, i, p))
+			if(getHovered(thegame, i, p))
 			{
 				if(thegame->command == 'M' && thegame->sel1)
 				{
@@ -324,9 +325,9 @@ void Logic(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 			}
 			if(thegame->command != ' ')
 			{
-				sendString += thegame->sel1->i + 48;
+				sendString += toString(thegame->sel1->i);
 				sendString += ' ';
-				sendString += thegame->sel1->p + 48;
+				sendString += toString(thegame->sel1->p);
 			}
 			if(thegame->command == 'M')
 			{
@@ -407,7 +408,7 @@ void MenuLogic(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 	thegame->arrow->z += InputData->MouseY / 20.0f;
 
 	base* hovtemp = hover;
-	if(getSelected(thegame, i, p))
+	if(getHovered(thegame, i, p))
 	{
 		if(hover = getHexagon(thegame, i, p))
 		{
@@ -426,7 +427,7 @@ void MenuLogic(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 	if(InputData->MouseButton && !thegame->buttonTimer)
 	{	
 		thegame->buttonTimer = 10;
-		if(getSelected(thegame, i, p))
+		if(getHovered(thegame, i, p))
 		{
 			sel1 = getHexagon(thegame, i, p);
 			string colors[] = {"white", "red", "green", "blue", "yellow", "orange", "cyan"};
@@ -552,7 +553,8 @@ void doAction(Game* thegame, action tempAction)
 		else if(tempAction.item == "turret")
 		{
 			base* hex = getHexagon(thegame, tempAction.int1, tempAction.int2);
-			base* temp = new rotator(hex->x, hex->y + 1.0f, hex->z, 0.3f, (color)tempAction.int3, GetModel(thegame, 3), tempAction.int1, tempAction.int2);
+			base* temp = new rotator(hex->x, hex->y + 1.0f, hex->z, 0.7f, (color)tempAction.int3, GetModel(thegame, 3), tempAction.int1, tempAction.int2);
+			thegame->objects.insert(thegame->objects.end(), temp);
 		}
 	}
 	else if(tempAction.name == "_setup")
@@ -563,5 +565,12 @@ void doAction(Game* thegame, action tempAction)
 	else if(tempAction.name == "_play")
 		thegame->setup = true;
 	else if(tempAction.name == "peschkes")
-		thegame->msg = "peschkes: " + tempAction.int1;
+		thegame->msg = "peschkes: " + toString(tempAction.int1);
+}
+
+string toString(int i)
+{
+	char temp[10];
+	_itoa_s(i, temp, 10);
+	return (string)temp;
 }
