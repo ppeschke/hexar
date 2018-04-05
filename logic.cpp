@@ -48,10 +48,10 @@ base* getHexagon(Game* thegame, int i, int p)
 
 base* getItem(Game* thegame, int i, int p)
 {
-	for(list<base*>::iterator index = thegame->objects.begin(); index != thegame->objects.end(); ++index)
+	for(list<base*>::reverse_iterator rindex = thegame->objects.rbegin(); rindex != thegame->objects.rend(); ++rindex)
 	{
-		if((*index)->coords(i, p) && typeid(hexagon) != typeid(**index))
-			return (*index);
+		if((*rindex)->rcoords(i, p))
+			return (*rindex);
 	}
 	return nullptr;
 }
@@ -149,6 +149,7 @@ void Logic(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 {
 	int i, p;
 	static base* hover = NULL;
+	bool commandComplete = false;
     // for every frame...
 	thegame->arrow->onStep();
 	Client->locker.lock();
@@ -328,16 +329,22 @@ void Logic(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 				sendString += toString(thegame->sel1->i);
 				sendString += ' ';
 				sendString += toString(thegame->sel1->p);
+				commandComplete = true;
 			}
-			if(thegame->command == 'M')
+			if(thegame->command == 'M' && thegame->sel2)
 			{
 				sendString += ' ';
-				sendString += thegame->sel2->i + 48;
+				sendString += toString(thegame->sel2->i);
 				sendString += ' ';
-				sendString += thegame->sel2->p + 48;
+				sendString += toString(thegame->sel2->p);
 			}
-			Client->Send(sendString.c_str());
-			thegame->command = ' ';
+			else if(thegame->command == 'M')
+				commandComplete = false;
+			if(commandComplete)
+			{
+				Client->Send(sendString.c_str());
+				thegame->command = ' ';
+			}
 		}
 		else if(thegame->command == 'E')
 		{
@@ -566,6 +573,18 @@ void doAction(Game* thegame, action tempAction)
 		thegame->setup = true;
 	else if(tempAction.name == "peschkes")
 		thegame->msg = "peschkes: " + toString(tempAction.int1);
+	else if(tempAction.name == "_move")
+	{
+		base* item = getItem(thegame, tempAction.int1, tempAction.int2);
+		base* hex = getHexagon(thegame, tempAction.int3, tempAction.int4);
+		if(!(item && hex))
+			exit(EXIT_FAILURE);
+		item->i = tempAction.int3;
+		item->p = tempAction.int4;
+		item->x = hex->x;
+		item->z = hex->z;
+		hex->c = item->c;
+	}
 }
 
 string toString(int i)

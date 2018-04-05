@@ -4,6 +4,8 @@ const float PI = 3.14159f;
 
 rotator::rotator(float _x, float _y, float _z, float _scale, color _c, MODEL* _m, int _i, int _p) : base(_x, _y, _z, _scale, _c, _m)
 {
+	i = _i;
+	p = _p;
 }
 
 rotator::~rotator(void)
