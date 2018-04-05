@@ -494,7 +494,6 @@ action parseMessage(Game* thegame, string b)
 		index = index2;
 		index2 = b.find(" ", index + 1);
 		a.int2 = atoi(b.substr(index+1, index2 - index - 1).c_str());
-		a.int3 = atoi(b.substr(index2+1).c_str());
 	}
 	else if(a.name == "_endturn")
 	{
@@ -548,19 +547,19 @@ void doAction(Game* thegame, action tempAction)
 		if(tempAction.item == "base")
 		{
 			base* hex = getHexagon(thegame, tempAction.int1, tempAction.int2);
-			base* temp = new outpost(hex->x, hex->y + 1.0f, hex->z, 0.3f, (color)tempAction.int3, GetModel(thegame, 2), tempAction.int1, tempAction.int2);
+			base* temp = new outpost(hex->x, hex->y + 1.0f, hex->z, 0.3f, hex->c, GetModel(thegame, 2), tempAction.int1, tempAction.int2);
 			thegame->objects.insert(thegame->objects.end(), temp);
 		}
 		else if(tempAction.item == "walker")
 		{
 			base* hex = getHexagon(thegame, tempAction.int1, tempAction.int2);
-			base* temp = new rotator(hex->x, hex->y + 1.0f, hex->z, 0.3f, (color)tempAction.int3, GetModel(thegame, 4), tempAction.int1, tempAction.int2);
+			base* temp = new rotator(hex->x, hex->y + 1.0f, hex->z, 0.3f, hex->c, GetModel(thegame, 4), tempAction.int1, tempAction.int2);
 			thegame->objects.insert(thegame->objects.end(), temp);
 		}
 		else if(tempAction.item == "turret")
 		{
 			base* hex = getHexagon(thegame, tempAction.int1, tempAction.int2);
-			base* temp = new rotator(hex->x, hex->y + 1.0f, hex->z, 0.7f, (color)tempAction.int3, GetModel(thegame, 3), tempAction.int1, tempAction.int2);
+			base* temp = new rotator(hex->x, hex->y + 1.0f, hex->z, 0.7f, hex->c, GetModel(thegame, 3), tempAction.int1, tempAction.int2);
 			thegame->objects.insert(thegame->objects.end(), temp);
 		}
 	}
