@@ -10,6 +10,7 @@ Game::Game(void)
 	sel2 = NULL;
 	command = ' ';
 	msg = "no messages";
+	peschkes = 0;
 }
 
 Game::~Game(void)

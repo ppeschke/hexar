@@ -161,11 +161,6 @@ void DrawModel(MODEL* Model, float x, float y, float z, float scale, float rotat
 	D3DMATERIAL9* tempMaterial = Model->Material;
 	switch(c)
 	{
-	case white:
-		tempMaterial->Diffuse.r = 1.0f;
-		tempMaterial->Diffuse.g = 1.0f;
-		tempMaterial->Diffuse.b = 1.0f;
-		break;
 	case red:
 		tempMaterial->Diffuse.r = 1.0f;
 		tempMaterial->Diffuse.g = 0.0f;
@@ -193,6 +188,11 @@ void DrawModel(MODEL* Model, float x, float y, float z, float scale, float rotat
 		break;
 	case cyan:
 		tempMaterial->Diffuse.r = 0.0f;
+		tempMaterial->Diffuse.g = 1.0f;
+		tempMaterial->Diffuse.b = 1.0f;
+		break;
+	default:	//white
+		tempMaterial->Diffuse.r = 1.0f;
 		tempMaterial->Diffuse.g = 1.0f;
 		tempMaterial->Diffuse.b = 1.0f;
 		break;
@@ -240,6 +240,13 @@ void InitLight()
 void drawText(const char* text)
 {
 	static RECT textbox;
-	SetRect(&textbox, 0, 0, 640, 480); 
+	SetRect(&textbox, 0, 0, 256, 300); 
 	dxfont->DrawTextA(NULL, text, strlen(text), &textbox, DT_LEFT | DT_TOP, D3DCOLOR_ARGB(255, 255, 255, 0));
+}
+
+void drawPeschkes(const char* peschkes)
+{
+	static RECT textbox;
+	SetRect(&textbox, 256, 0, 384, 100);
+	dxfont->DrawTextA(NULL, peschkes, strlen(peschkes), &textbox, DT_LEFT | DT_TOP, D3DCOLOR_ARGB(255, 255, 255, 255));
 }

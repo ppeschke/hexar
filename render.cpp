@@ -5,11 +5,13 @@
 void StartRender();
 void EndRender();
 void drawText(const char* text);
+void drawPeschkes(const char* text);
 void LoadModel(MODEL* Model, LPCTSTR File, int modelNum);
 void SetCamera();
 void AdjustCamera(float x, float y, float z);
 void InitLight();
 void DrawModel(MODEL* Model, float x, float y, float z, float scale, float rotation, color c);
+string toString(int);
 
 //render.cpp
 void Render(Game* thegame);
@@ -47,7 +49,8 @@ void Render(Game* thegame)
 	{
 		DrawModel((*index)->m, (*index)->x, (*index)->y, (*index)->z, (*index)->scale, (*index)->rotation, (*index)->c);
 	}
-
+	if(thegame->setup)
+		drawPeschkes((string("Peschkes: ") + toString(thegame->peschkes)).c_str());
 	drawText(thegame->msg.c_str());
     EndRender();
 

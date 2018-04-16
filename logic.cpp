@@ -570,8 +570,11 @@ void doAction(Game* thegame, action tempAction)
 	}
 	else if(tempAction.name == "_play")
 		thegame->setup = true;
-	else if(tempAction.name == "peschkes")
+	else if(tempAction.name == "_peschkes")
+	{
 		thegame->msg = "peschkes: " + toString(tempAction.int1);
+		thegame->peschkes = tempAction.int1;
+	}
 	else if(tempAction.name == "_move")
 	{
 		base* item = getItem(thegame, tempAction.int1, tempAction.int2);

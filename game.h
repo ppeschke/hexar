@@ -25,4 +25,5 @@ public:
 	base* sel2;
 	char command;
 	string msg;
+	int peschkes;
 };
