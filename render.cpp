@@ -20,19 +20,19 @@ void LoadGraphics(Game* thegame);
 void LoadGraphics(Game* thegame)
 {
 	MODEL* temp = new MODEL;
-    LoadModel(temp, TEXT("hex6.x"), 1);
+    LoadModel(temp, TEXT("hex7.x"), 1);
 	thegame->models.insert(thegame->models.end(), temp);
 	temp = new MODEL;
-	LoadModel(temp, TEXT("base.x"), 2);
+	LoadModel(temp, TEXT("base2.x"), 2);
 	thegame->models.insert(thegame->models.end(), temp);
 	temp = new MODEL;
-	LoadModel(temp, TEXT("turret.x"), 3);
+	LoadModel(temp, TEXT("turret2.x"), 3);
 	thegame->models.insert(thegame->models.end(), temp);
 	temp = new MODEL;
-	LoadModel(temp, TEXT("walker.x"), 4);
+	LoadModel(temp, TEXT("walker2.x"), 4);
 	thegame->models.insert(thegame->models.end(), temp);
 	temp = new MODEL;
-	LoadModel(temp, TEXT("arrow.x"), 5);
+	LoadModel(temp, TEXT("arrow2.x"), 5);
 	thegame->models.insert(thegame->models.end(), temp);
     SetCamera();
 	AdjustCamera(1.5f, 30.0f, 10.0f);

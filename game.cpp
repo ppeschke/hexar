@@ -11,6 +11,7 @@ Game::Game(void)
 	command = ' ';
 	msg = "no messages";
 	peschkes = 0;
+	playerColor = white;
 }
 
 Game::~Game(void)

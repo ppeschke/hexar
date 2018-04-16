@@ -140,7 +140,7 @@ void AdjustCamera(float x, float y, float z)
 
     D3DXMatrixLookAtLH(&matView,
                        &D3DXVECTOR3 (x, y, z),
-                       &D3DXVECTOR3 (1.5f, 0.0f, 0.0f),
+                       &D3DXVECTOR3 (0.0f, 0.0f, 0.0f),
                        &D3DXVECTOR3 (0.0f, 1.0f, 0.0f));
 
     d3ddev->SetTransform(D3DTS_VIEW, &matView);
@@ -213,28 +213,28 @@ void DrawModel(MODEL* Model, float x, float y, float z, float scale, float rotat
 void InitLight()
 {
     D3DLIGHT9 light;    // create the light struct
-	D3DLIGHT9 light2;
+	//D3DLIGHT9 light2;
     D3DMATERIAL9 material;    // create the material struct
 
     ZeroMemory(&light, sizeof(light));    // clear out the light struct for use
-	ZeroMemory(&light2, sizeof(light2));
+	//ZeroMemory(&light2, sizeof(light2));
     light.Type = D3DLIGHT_DIRECTIONAL;    // make the light type 'directional light'
     light.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);    // set the light's color
-    light.Direction = D3DXVECTOR3(0.0f, -1.0f, -1.0f);
-	light2.Type = D3DLIGHT_DIRECTIONAL;
-	light2.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);    // set the light's color
-	light2.Direction = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+    light.Direction = D3DXVECTOR3(1.0f, -1.0f, -1.0f);
+	//light2.Type = D3DLIGHT_DIRECTIONAL;
+	//light2.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);    // set the light's color
+	//light2.Direction = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 
     d3ddev->SetLight(0, &light);    // send the light struct properties to light #0
     d3ddev->LightEnable(0, TRUE);    // turn on light #0
-	d3ddev->SetLight(1, &light2);
-	d3ddev->LightEnable(1, TRUE);
+	/*d3ddev->SetLight(1, &light2);
+	d3ddev->LightEnable(1, TRUE);*/
 
     ZeroMemory(&material, sizeof(D3DMATERIAL9));    // clear out the struct for use
     material.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);    // set diffuse color to white
-    material.Ambient = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);    // set ambient color to white
+    material.Ambient = D3DXCOLOR(0.7f, 0.7f, 0.7f, 1.0f);    // set ambient color to white
 
-    //d3ddev->SetMaterial(&material);    // set the globably-used material to &material
+    d3ddev->SetMaterial(&material);    // set the globably-used material to &material
 }
 
 void drawText(const char* text)

@@ -135,7 +135,7 @@ void InitGame(Game* thegame, int playerNum, int rings)
 		rz += 2.0;
 	}
 	thegame->playerNum = playerNum;
-	thegame->arrow = new rotator(0.0f, 2.0f, 0.0f, 1.0f, white, GetModel(thegame, 5), 0, 0);
+	thegame->arrow = new rotator(0.0f, 2.0f, 0.0f, 1.0f, thegame->playerColor, GetModel(thegame, 5), 0, 0);
 	thegame->objects.insert(thegame->objects.end(), thegame->arrow);
 	return;
 }
@@ -535,6 +535,17 @@ void doAction(Game* thegame, action tempAction)
 		base* ptr = getHexagon(thegame, 0, p - 1);
 		delete ptr;
 		thegame->objects.remove(ptr);
+	}
+	else if(tempAction.name == "_granted")
+	{
+		string colors[7] = {"white", "red", "green", "blue", "yellow", "orange", "cyan"};
+		int p;
+		for(p = 0; p < 7; ++p)
+		{
+			if(colors[p] == tempAction.item)
+				break;
+		}
+		thegame->playerColor = (color)p;
 	}
 	else if(tempAction.name == "_grab")
 	{

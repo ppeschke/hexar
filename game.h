@@ -19,6 +19,7 @@ public:
 	bool setup;
 	int playerNum;
 	color playercolors[6];
+	color playerColor;
 	base* arrow;
 	int buttonTimer;
 	base* sel1;
