@@ -92,7 +92,7 @@ bool getHovered(Game* thegame, int& i, int& p)
 	return found;
 }
 
-void MainMenu(Game* thegame)
+void SetupMenu(Game* thegame)
 {
 	camZoom = 40.0f;
 	camXAngle = PI / 2;
@@ -145,7 +145,7 @@ float randomNumber(float low, float high)
 	return low + ((float)rand() / (float)RAND_MAX) * (high - low);
 }
 
-void Logic(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
+void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 {
 	int i, p;
 	static base* hover = NULL;
@@ -366,7 +366,7 @@ void Logic(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
     return;
 }
 
-void MenuLogic(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
+void RunMenuFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 {
 	int i, p;
 	static base* hover = NULL;
@@ -432,7 +432,7 @@ void MenuLogic(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 	}
 
 	if(InputData->MouseButton && !thegame->buttonTimer)
-	{	
+	{
 		thegame->buttonTimer = 10;
 		if(getHovered(thegame, i, p))
 		{
@@ -446,158 +446,11 @@ void MenuLogic(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 		sel1->y = 2.0f;
 
 	AdjustCamera((float)cos((double)camXAngle) * camZoom * (float)cos((double)camYAngle),
-				 (float)sin((double)camYAngle) * camZoom,
+		(float)sin((double)camYAngle) * camZoom,
 				 (float)sin((double)camXAngle) * camZoom * (float)cos((double)camYAngle));
 	if(thegame->buttonTimer > 0)
 		thegame->buttonTimer -= 1;
 	return;
-}
-
-action parseMessage(Game* thegame, string b)
-{
-	thegame->msg = b;
-	action a;
-	int index = b.find(" ");
-	int index2;
-	a.name = b.substr(0, index);
-	if(a.name == "_grab")
-	{
-		index2 = b.find(" ", index + 1);
-		a.int1 = atoi(b.substr(index + 1, index2 - index - 1).c_str());
-		index = index2;
-		index2 = b.find(" ", index + 1);
-		a.int2 = atoi(b.substr(index + 1, index2 - index - 1).c_str());
-		index = index2;
-		a.int3 = atoi(b.substr(index+1).c_str());
-		
-	}
-	else if(a.name == "_move")
-	{
-		index2 = b.find(" ", index + 1);
-		a.int1 = atoi(b.substr(index+1, index2 - index - 1).c_str());
-		index = index2;
-		index2 = b.find(" ", index + 1);
-		a.int2 = atoi(b.substr(index+1, index2 - index - 1).c_str());
-		index = index2;
-		index2 = b.find(" ", index + 1);
-		a.int3 = atoi(b.substr(index+1, index2 - index - 1).c_str());
-		index = index2;
-		a.int4 = atoi(b.substr(index+1).c_str());
-	}
-	else if(a.name == "_buy")
-	{
-		index2 = b.find(" ", index + 1);
-		a.item = b.substr(index + 1, index2 - index - 1);
-		index = index2;
-		index2 = b.find(" ", index + 1);
-		a.int1 = atoi(b.substr(index+1, index2 - index - 1).c_str());
-		index = index2;
-		index2 = b.find(" ", index + 1);
-		a.int2 = atoi(b.substr(index+1, index2 - index - 1).c_str());
-	}
-	else if(a.name == "_endturn")
-	{
-	}
-	else if(a.name == "_granted")
-	{
-		a.item = b.substr(index + 1);
-	}
-	else if(a.name == "_taken")
-	{
-		a.item = b.substr(index + 1);
-	}
-	else if(a.name == "_setup")
-	{
-		index2 = b.find(" ", index + 1);
-		a.int1 = atoi(b.substr(index+1, index2 - index - 1).c_str());
-		index = index2;
-		index2 = b.find(" ", index + 1);
-		a.int2 = atoi(b.substr(index+1, index2 - index - 1).c_str());
-	}
-	else if(a.name == "_peschkes")
-	{
-		a.int1 = atoi(b.substr(index).c_str());
-	}
-	return a;
-}
-
-void doAction(Game* thegame, action tempAction)
-{
-	if(tempAction.name == "_taken")
-	{
-		string colors[7] = {"white", "red", "green", "blue", "yellow", "orange", "cyan"};
-		int p;
-		for(p = 0; p < 7; ++p)
-		{
-			if(colors[p] == tempAction.item)
-				break;
-		}
-		base* ptr = getHexagon(thegame, 0, p - 1);
-		delete ptr;
-		thegame->objects.remove(ptr);
-	}
-	else if(tempAction.name == "_granted")
-	{
-		string colors[7] = {"white", "red", "green", "blue", "yellow", "orange", "cyan"};
-		int p;
-		for(p = 0; p < 7; ++p)
-		{
-			if(colors[p] == tempAction.item)
-				break;
-		}
-		thegame->playerColor = (color)p;
-	}
-	else if(tempAction.name == "_grab")
-	{
-		base* temp = getHexagon(thegame, tempAction.int1, tempAction.int2);
-		if(temp)
-			temp->c = (color)tempAction.int3;
-	}
-	else if(tempAction.name == "_buy")
-	{
-		if(tempAction.item == "base")
-		{
-			base* hex = getHexagon(thegame, tempAction.int1, tempAction.int2);
-			base* temp = new outpost(hex->x, hex->y + 1.0f, hex->z, 0.3f, hex->c, GetModel(thegame, 2), tempAction.int1, tempAction.int2);
-			thegame->objects.insert(thegame->objects.end(), temp);
-		}
-		else if(tempAction.item == "walker")
-		{
-			base* hex = getHexagon(thegame, tempAction.int1, tempAction.int2);
-			base* temp = new rotator(hex->x, hex->y + 1.0f, hex->z, 0.3f, hex->c, GetModel(thegame, 4), tempAction.int1, tempAction.int2);
-			thegame->objects.insert(thegame->objects.end(), temp);
-		}
-		else if(tempAction.item == "turret")
-		{
-			base* hex = getHexagon(thegame, tempAction.int1, tempAction.int2);
-			base* temp = new rotator(hex->x, hex->y + 1.0f, hex->z, 0.7f, hex->c, GetModel(thegame, 3), tempAction.int1, tempAction.int2);
-			thegame->objects.insert(thegame->objects.end(), temp);
-		}
-	}
-	else if(tempAction.name == "_setup")
-	{
-		thegame->CleanObjs();
-		InitGame(thegame, tempAction.int1, tempAction.int2);
-	}
-	else if(tempAction.name == "_play")
-		thegame->setup = true;
-	else if(tempAction.name == "_peschkes")
-	{
-		thegame->msg = "peschkes: " + toString(tempAction.int1);
-		thegame->peschkes = tempAction.int1;
-	}
-	else if(tempAction.name == "_move")
-	{
-		base* item = getItem(thegame, tempAction.int1, tempAction.int2);
-		base* hex = getHexagon(thegame, tempAction.int3, tempAction.int4);
-		if(!(item && hex))
-			exit(EXIT_FAILURE);
-		item->i = tempAction.int3;
-		item->p = tempAction.int4;
-		item->x = hex->x;
-		item->z = hex->z;
-		hex->c = item->c;
-	}
 }
 
 string toString(int i)

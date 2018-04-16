@@ -7,7 +7,7 @@ void InitDirect3D(GAMEWINDOW* gw);
 void CloseDirect3D();
 void InitDirectInput(HINSTANCE hInstance, GAMEWINDOW* gw);
 void CloseDirectInput(void);
-void MainLoop(const char* ServerAddress);
+void OuterLoop(const char* ServerAddress);
 
 // Starting Point
 int WINAPI WinMain(HINSTANCE hInstance,
@@ -22,7 +22,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     InitDirect3D(&gw);
     InitDirectInput(hInstance, &gw);
 
-    MainLoop("10.44.0.144");
+    OuterLoop("10.44.0.144");
 
     CloseDirect3D();
     CloseDirectInput();

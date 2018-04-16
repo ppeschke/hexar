@@ -4,14 +4,14 @@
 
 void LoadGraphics(Game* thegame);
 bool HandleMessages();
-void MainMenu(Game* thegame);
+void SetupMenu(Game* thegame);
 void Input(INPUTDATA* InputData);
 void Render(Game* thegame);
-void MenuLogic(Game* thegame, INPUTDATA* InputData, NetworkClient* Client);
-void Logic(Game* thegame, INPUTDATA* InputData, NetworkClient* Client);
+void RunMenuFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client);
+void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client);
 
-// The Main Loop
-void MainLoop(const char* ServerAddress)
+// The Outer Loop
+void OuterLoop(const char* ServerAddress)
 {
 	DWORD timer;
 	Game thegame;
@@ -53,18 +53,19 @@ void MainLoop(const char* ServerAddress)
 		Render(&thegame);
 	}
 	thegame.msg = "Pick your color";
-	MainMenu(&thegame);			//sets up a list of colored tiles for the user to pick their color
+	SetupMenu(&thegame);			//sets up a list of colored tiles for the user to pick their color
 	while(!thegame.setup && !thegame.over && HandleMessages())
     {
         Input(&InputData);
-        MenuLogic(&thegame, &InputData, &Client);
+        RunMenuFrame(&thegame, &InputData, &Client);
         Render(&thegame);
     }
 
+	//main game loop
     while(HandleMessages() && !thegame.over)
     {
         Input(&InputData);
-        Logic(&thegame, &InputData, &Client);
+        RunFrame(&thegame, &InputData, &Client);
         Render(&thegame);
     }
 	thegame.msg = "Waiting for goodbye from server.";
