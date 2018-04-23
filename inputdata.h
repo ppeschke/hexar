@@ -6,6 +6,7 @@ struct INPUTDATA
     bool MoveDown;
 	bool Esc;
 	bool MouseButton;
+	bool Clicked;
 
 	bool T;
 	bool W;

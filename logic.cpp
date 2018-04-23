@@ -79,7 +79,7 @@ bool getHovered(Game* thegame, int& i, int& p)
 			found = true;
 		}
 	}
-	for(list<base*>::iterator index = close.begin(); index != close.end(); ++index)
+	for(list<base*>::iterator index = close.begin(); found && index != close.end(); ++index)
 	{
 		float temp = distance(thegame->arrow->x, thegame->arrow->z, (*index)->x, (*index)->z); 
 		if(temp < dist)
@@ -147,7 +147,7 @@ float randomNumber(float low, float high)
 
 void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 {
-	int i, p;
+	int i = -1, p = -1;
 	static base* hover = NULL;
 	bool commandComplete = false;
     // for every frame...
@@ -210,28 +210,6 @@ void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 		thegame->command = 'W';
 		thegame->buttonTimer = 10;
 	}
-	if(thegame->buttonTimer == 0 && InputData->M)
-	{
-		if(thegame->sel1)
-			thegame->sel1->y = 0.0f;
-		if(thegame->sel2)
-			thegame->sel2->y = 0.0f;
-		thegame->sel1 = NULL;
-		thegame->sel2 = NULL;
-		thegame->command = 'M';
-		thegame->buttonTimer = 10;
-	}
-	if(thegame->buttonTimer == 0 && InputData->G)
-	{
-		if(thegame->sel1)
-			thegame->sel1->y = 0.0f;
-		if(thegame->sel2)
-			thegame->sel2->y = 0.0f;
-		thegame->sel1 = NULL;
-		thegame->sel2 = NULL;
-		thegame->command = 'G';
-		thegame->buttonTimer = 10;
-	}
 	if(thegame->buttonTimer == 0 && InputData->EndTurn)
 	{
 		if(thegame->sel1)
@@ -263,41 +241,76 @@ void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 	thegame->arrow->x -= InputData->MouseX / 20.0f;
 	thegame->arrow->z += InputData->MouseY / 20.0f;
 
-	base* hovtemp = hover;
-	if(getHovered(thegame, i, p))
-	{
+	base* prevHover;
+	prevHover = hover;
+	//may set i and p
+	getHovered(thegame, i, p);
+	if(i != -1 && p != -1)
 		if(hover = getHexagon(thegame, i, p))
-		{
-			if(hovtemp)
-				hovtemp->y = 0.0f;
 			hover->y = 1.0f;
-		}
-	}
-	else
-	{
-		if(hover)
-			hover->y = 0.0f;
-		hover = NULL;
-	}
+	if(prevHover && prevHover != hover)
+		prevHover->y = 0.0f;
 
-	if(InputData->MouseButton && !thegame->buttonTimer && thegame->command != ' ')
+	//mouse only commands (land grab and move actions)
+	if(InputData->Clicked && (thegame->command == ' ' || thegame->command == 'M'))
 	{
-		if(thegame->buttonTimer == 0)
+		if(thegame->command == 'M')
 		{
-			thegame->buttonTimer = 10;
-			if(getHovered(thegame, i, p))
+			thegame->sel2 = getHexagon(thegame, i, p);
+			if(thegame->sel2)
 			{
-				if(thegame->command == 'M' && thegame->sel1)
+				string sendString = "_move ";
+				sendString += toString(thegame->sel1->i) + " " + toString(thegame->sel1->p) + " ";
+				sendString += toString(thegame->sel2->i) + " " + toString(thegame->sel2->p);
+				Client->Send(sendString.c_str());
+				thegame->command = ' ';
+			}
+			else
+				thegame->msg = "You must select a tile to move to!";
+		}
+		else
+		{
+			thegame->sel1 = getHexagon(thegame, i, p);
+			if(thegame->sel1)
+			{
+				base* item = getItem(thegame, thegame->sel1->i, thegame->sel1->p);
+				if(item == nullptr)
 				{
-					thegame->sel2 = getHexagon(thegame, i, p);
+					//try a grab command
+					string sendString = "_grab ";
+					sendString += toString(thegame->sel1->i);
+					sendString += ' ';
+					sendString += toString(thegame->sel1->p);
+					Client->Send(sendString.c_str());
+					thegame->command = ' ';
 				}
 				else
-					thegame->sel1 = getHexagon(thegame, i, p);
+					thegame->command = 'M';
 			}
+			else
+				thegame->msg = "You must select a tile or choose a command.";
+		}
+		
+		InputData->Clicked = false;
+	}
+
+	if(InputData->MouseButton)
+	{
+		if(getHovered(thegame, i, p))
+		{
+			base* hex = getHexagon(thegame, i, p);
 		}
 	}
-	if(thegame->sel1)
-		thegame->sel1->y = 2.0f;
+
+	if(InputData->Clicked && thegame->buttonTimer == 0 && !(thegame->command == ' ' || thegame->command == 'M'))
+	{
+		thegame->buttonTimer = 10;
+		if(getHovered(thegame, i, p))
+		{
+			thegame->sel1 = getHexagon(thegame, i, p);
+		}
+		InputData->Clicked = false;
+	}
 
 	if(thegame->command != ' ')
 	{
@@ -306,12 +319,6 @@ void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 			string sendString = "";
 			switch(thegame->command)
 			{
-			case 'G':
-				sendString = "_grab ";
-				break;
-			case 'M':
-				sendString = "_move ";
-				break;
 			case 'B':
 				sendString = "_buy base ";
 				break;
@@ -431,7 +438,7 @@ void RunMenuFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 		hover = NULL;
 	}
 
-	if(InputData->MouseButton && !thegame->buttonTimer)
+	if(InputData->Clicked)
 	{
 		thegame->buttonTimer = 10;
 		if(getHovered(thegame, i, p))
@@ -441,6 +448,7 @@ void RunMenuFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 			string msg = "_request " + colors[p + 1];
 			Client->Send(msg.c_str());
 		}
+		InputData->Clicked = false;
 	}
 	if(sel1)
 		sel1->y = 2.0f;

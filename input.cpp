@@ -10,6 +10,11 @@ void Input(INPUTDATA* InputData)
 {
     static BYTE Keys[256];
     static DIMOUSESTATE Mouse;
+	static bool ClickStarted = false;
+	static bool Clicked = false;
+
+	if(InputData->Clicked == false)	//input was handled
+		Clicked = false;
 
     GetKeys(&Keys[0]);
     GetMouse(&Mouse);
@@ -46,6 +51,18 @@ void Input(INPUTDATA* InputData)
     InputData->MouseZ = (float)Mouse.lZ;
 
 	if(Mouse.rgbButtons[0])
+	{
 		InputData->MouseButton = true;
+		ClickStarted = true;
+	}
+	else
+	{
+		if(ClickStarted)
+		{
+			Clicked = true;
+			ClickStarted = false;
+		}
+	}
+	InputData->Clicked = Clicked;
     return;
 } 
