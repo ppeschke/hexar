@@ -9,7 +9,7 @@ using namespace std;
 class Message
 {
 public:
-	Message(string msg, DWORD timer);
+	Message(string msg, DWORD timer, unsigned int lines);
 	~Message();
 
 	void Run(DWORD deltaTime);
@@ -17,11 +17,13 @@ public:
 	string getMessage();
 	void setRect(int left, int top, int right, int bottom);
 	RECT* getRect();
+	unsigned int getLines();
 
 private:
 	string msg;
 	DWORD timer;
 	bool expired;
 	RECT rect;
+	int lines;
 };
 

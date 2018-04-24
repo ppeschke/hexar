@@ -58,6 +58,7 @@ void InitDirect3D(GAMEWINDOW* gw)
 // Close the Device and Direct3D
 void CloseDirect3D()
 {
+	dxfont->Release();
     d3ddev->Release();
     d3d->Release();
 
@@ -239,12 +240,21 @@ void InitLight()
 
 void drawTextAt(const char* text, RECT* textbox)
 {
-	dxfont->DrawTextA(NULL, text, strlen(text), textbox, DT_LEFT | DT_TOP, D3DCOLOR_ARGB(255, 255, 255, 0));
+	dxfont->DrawTextA(NULL, text, strlen(text), textbox, DT_LEFT | DT_TOP | DT_WORDBREAK, D3DCOLOR_ARGB(255, 255, 255, 0));
 }
 
 void drawPeschkes(const char* peschkes)
 {
 	static RECT textbox;
 	SetRect(&textbox, 256, 0, 384, 100);
-	dxfont->DrawTextA(NULL, peschkes, strlen(peschkes), &textbox, DT_LEFT | DT_TOP, D3DCOLOR_ARGB(255, 255, 255, 255));
+	dxfont->DrawTextA(NULL, peschkes, strlen(peschkes), &textbox, DT_LEFT | DT_TOP,
+					  D3DCOLOR_ARGB(255, 255, 255, 255));
+}
+
+int figureTextLength(const char* str)
+{
+	RECT box;
+	SetRect(&box, 0, 0, 256, 100);
+	dxfont->DrawTextA(NULL, str, strlen(str), &box, DT_LEFT | DT_TOP | DT_CALCRECT, D3DCOLOR_ARGB(255, 255, 255, 255));
+	return box.right;
 }

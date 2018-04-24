@@ -1,10 +1,11 @@
 #include "Message.h"
 
-Message::Message(string m, DWORD t)
+Message::Message(string m, DWORD t, unsigned int lin)
 {
 	msg = m;
 	timer = t;
 	expired = false;
+	lines = lin;
 }
 
 Message::~Message()
@@ -36,4 +37,9 @@ void Message::setRect(int left, int top, int right, int bottom)
 RECT* Message::getRect()
 {	//haha get wrecked!
 	return &this->rect;
+}
+
+unsigned int Message::getLines()
+{
+	return lines;
 }

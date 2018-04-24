@@ -2,6 +2,7 @@
 
 //from direct3d.cpp
 void drawTextAt(const char* text, RECT* rect);
+int figureTextLength(const char* str);
 
 MessageQueue::MessageQueue()
 {
@@ -29,19 +30,23 @@ void MessageQueue::Run(DWORD deltaTime)
 			messages.pop_front();
 
 	int top = 0;
-	int bottom;
+	int height;
 	//reset text rectangles for messages
 	for(auto index = messages.begin(); index != messages.end(); ++index)
 	{
-		bottom = top + 15;
+		height = (index->getLines() * 20);
 		//left, top, right, bottom (not length or height)
-		index->setRect(0, top, 256, bottom);
-		top += 15;
+		index->setRect(0, top, 256, top + height);
+		top += height;
 	}
 }
 
 void MessageQueue::AddMessage(string msg, float seconds)
 {
 	//add code to add newline characters where appropriate
-	messages.push_back(Message(msg, DWORD(seconds * 1000.0f)));
+	int len = figureTextLength(msg.c_str());
+	if(len < 256)
+		messages.push_back(Message(msg, DWORD(seconds * 1000.0f), 1));
+	else
+		messages.push_back(Message(msg, DWORD(seconds * 1000.0f), 2));
 }
