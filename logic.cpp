@@ -1,4 +1,3 @@
-#include <cmath>
 #include <fstream>
 using namespace std;
 
@@ -12,14 +11,7 @@ using namespace std;
 #include "outpost.h"
 #include "turret.h"
 
-//direct3d.cpp prototypes
-void AdjustCamera(float x, float y, float z);
-
-// global variables
-float camXAngle;
-float camYAngle;
-float camZoom;
-const float PI = 3.14159f;
+//global variables
 ofstream debugFile("debug.txt");
 
 action parseMessage(Game* thegame, string buffer);
@@ -94,12 +86,7 @@ bool getHovered(Game* thegame, int& i, int& p)
 
 void SetupMenu(Game* thegame)
 {
-	camZoom = 40.0f;
-	camXAngle = PI / 2;
-	camYAngle = 3 * PI / 8;
-	AdjustCamera((float)cos((double)camXAngle) * camZoom * (float)cos((double)camYAngle),
-				 (float)sin((double)camYAngle) * camZoom,
-				 (float)sin((double)camXAngle) * camZoom * (float)cos((double)camYAngle));
+	thegame->camera.SetCamera(40.0f, thegame->camera.PI / 2, 3 * thegame->camera.PI / 8);
 	base* temp = NULL;
 	float x = 7.5f + 1.25f;
 	for(int i = 0; i < 6; ++i)
@@ -169,14 +156,7 @@ void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 
 	if(InputData->Esc)
 		thegame->over = true;
-	if(InputData->MoveUp)
-		camYAngle += 0.03f;
-	if(InputData->MoveDown)
-		camYAngle -= 0.03f;
-	if(InputData->MoveLeft)
-		camXAngle -= 0.03f;
-	if(InputData->MoveRight)
-		camXAngle += 0.03f;
+	thegame->camera.Run(InputData);
 	if(thegame->buttonTimer == 0 && InputData->B)
 	{
 		if(thegame->sel1)
@@ -222,22 +202,6 @@ void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 		thegame->buttonTimer = 10;
 	}
 
-	if(camXAngle > 2 * PI)
-		camXAngle = 0.0f;
-	if(camXAngle < 0.0f)
-		camXAngle = 2 * PI;
-	if(camYAngle > 3 * PI / 8)
-		camYAngle = 3 * PI / 8;
-	if(camYAngle < PI / 6)
-		camYAngle = PI / 6;
-
-	camZoom -= InputData->MouseZ / 50.0f;
-
-	if(camZoom < 20.0f)
-		camZoom = 20.0f;
-	if(camZoom > 90.0f)
-		camZoom = 90.0f;
-
 	thegame->arrow->x -= InputData->MouseX / 20.0f;
 	thegame->arrow->z += InputData->MouseY / 20.0f;
 
@@ -264,6 +228,8 @@ void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 				sendString += toString(thegame->sel2->i) + " " + toString(thegame->sel2->p);
 				Client->Send(sendString.c_str());
 				thegame->command = ' ';
+				thegame->sel1 = nullptr;
+				thegame->sel2 = nullptr;
 			}
 			else
 				thegame->msg = "You must select a tile to move to!";
@@ -294,13 +260,13 @@ void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 		InputData->Clicked = false;
 	}
 
-	if(InputData->MouseButton)
+	/*if(InputData->MouseButton)
 	{
 		if(getHovered(thegame, i, p))
 		{
 			base* hex = getHexagon(thegame, i, p);
 		}
-	}
+	}*/
 
 	if(InputData->Clicked && thegame->buttonTimer == 0 && !(thegame->command == ' ' || thegame->command == 'M'))
 	{
@@ -312,7 +278,7 @@ void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 		InputData->Clicked = false;
 	}
 
-	if(thegame->command != ' ')
+	if(thegame->command != ' ' && thegame->command != 'M')
 	{
 		if(thegame->sel1)
 		{
@@ -338,15 +304,6 @@ void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 				sendString += toString(thegame->sel1->p);
 				commandComplete = true;
 			}
-			if(thegame->command == 'M' && thegame->sel2)
-			{
-				sendString += ' ';
-				sendString += toString(thegame->sel2->i);
-				sendString += ' ';
-				sendString += toString(thegame->sel2->p);
-			}
-			else if(thegame->command == 'M')
-				commandComplete = false;
 			if(commandComplete)
 			{
 				Client->Send(sendString.c_str());
@@ -360,9 +317,7 @@ void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 		}
 	}
 
-	AdjustCamera((float)cos((double)camXAngle) * camZoom * (float)cos((double)camYAngle),
-				 (float)sin((double)camYAngle) * camZoom,
-				 (float)sin((double)camXAngle) * camZoom * (float)cos((double)camYAngle));
+	
 	if(thegame->buttonTimer > 0)
 		thegame->buttonTimer -= 1;
 
@@ -391,32 +346,7 @@ void RunMenuFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 	Client->locker.unlock();
 	thegame->arrow->onStep();
 
-	if(InputData->Esc)
-		thegame->over = true;
-	if(InputData->MoveUp)
-		camYAngle += 0.03f;
-	if(InputData->MoveDown)
-		camYAngle -= 0.03f;
-	if(InputData->MoveLeft)
-		camXAngle -= 0.03f;
-	if(InputData->MoveRight)
-		camXAngle += 0.03f;
-
-	if(camXAngle > 2 * PI)
-		camXAngle = 0.0f;
-	if(camXAngle < 0.0f)
-		camXAngle = 2 * PI;
-	if(camYAngle > 3 * PI / 8)
-		camYAngle = 3 * PI / 8;
-	if(camYAngle < PI / 6)
-		camYAngle = PI / 6;
-
-	camZoom -= InputData->MouseZ / 50.0f;
-
-	if(camZoom < 20.0f)
-		camZoom = 20.0f;
-	if(camZoom > 90.0f)
-		camZoom = 90.0f;
+	thegame->camera.Run(InputData);
 
 	thegame->arrow->x -= InputData->MouseX / 20.0f;
 	thegame->arrow->z += InputData->MouseY / 20.0f;
@@ -453,9 +383,6 @@ void RunMenuFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 	if(sel1)
 		sel1->y = 2.0f;
 
-	AdjustCamera((float)cos((double)camXAngle) * camZoom * (float)cos((double)camYAngle),
-		(float)sin((double)camYAngle) * camZoom,
-				 (float)sin((double)camXAngle) * camZoom * (float)cos((double)camYAngle));
 	if(thegame->buttonTimer > 0)
 		thegame->buttonTimer -= 1;
 	return;

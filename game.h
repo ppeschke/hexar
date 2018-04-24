@@ -4,6 +4,7 @@
 using namespace std;
 
 #include "base.h"
+#include "Camera.h"
 
 class Game
 {
@@ -27,4 +28,5 @@ public:
 	char command;
 	string msg;
 	int peschkes;
+	Camera camera;
 };
