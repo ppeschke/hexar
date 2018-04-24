@@ -9,7 +9,6 @@ Game::Game(void)
 	sel1 = NULL;
 	sel2 = NULL;
 	command = ' ';
-	msg = "no messages";
 	peschkes = 0;
 	playerColor = white;
 }

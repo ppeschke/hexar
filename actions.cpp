@@ -70,7 +70,7 @@ void doAction(Game* thegame, action tempAction)
 		thegame->setup = true;
 	else if(tempAction.name == "_peschkes")
 	{
-		thegame->msg = "peschkes: " + toString(tempAction.int1);
+		thegame->messages.AddMessage("peschkes: " + toString(tempAction.int1), 5);
 		thegame->peschkes = tempAction.int1;
 	}
 	else if(tempAction.name == "_move")

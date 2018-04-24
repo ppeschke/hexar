@@ -51,7 +51,7 @@ void Render(Game* thegame)
 	}
 	if(thegame->setup)
 		drawPeschkes((string("Peschkes: ") + toString(thegame->peschkes)).c_str());
-	drawText(thegame->msg.c_str());
+	thegame->messages.Render();
     EndRender();
 
     return;

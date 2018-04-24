@@ -7,8 +7,8 @@ bool HandleMessages();
 void SetupMenu(Game* thegame);
 void Input(INPUTDATA* InputData);
 void Render(Game* thegame);
-void RunMenuFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client);
-void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client);
+void RunMenuFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, DWORD deltaTime);
+void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, DWORD deltaTime);
 
 // The Outer Loop
 void OuterLoop(const char* ServerAddress)
@@ -20,23 +20,33 @@ void OuterLoop(const char* ServerAddress)
 	LoadGraphics(&thegame);
 	Input(&InputData);
 	timer = GetTickCount();
+	DWORD startingPoint = GetTickCount();
+	DWORD deltaTime;
 	//connecting loop
-	thegame.msg = "waiting to connect with " + string(ServerAddress);
+	thegame.messages.AddMessage("connecting with " + string(ServerAddress), 10);
 	while(!Client.Connected() && !InputData.Esc)
 	{
+		deltaTime = GetTickCount() - startingPoint;
+		startingPoint = GetTickCount();
 		Input(&InputData);
+		thegame.messages.Run(deltaTime);
 		if(GetTickCount() > (timer + 1000))
 		{
 			//output message connecting to server
 			Client.Knock();
 			timer = GetTickCount();
 		}
+		thegame.messages.Run(deltaTime);
 		Render(&thegame);
 	}
-	thegame.msg = "connected, waiting for other players";
-	while(!InputData.Esc)
+	thegame.messages.AddMessage("connected, waiting for other players", 10);
+	startingPoint = GetTickCount();
+	while(true)
 	{
+		deltaTime = GetTickCount() - startingPoint;
+		startingPoint = GetTickCount();
 		Input(&InputData);
+		thegame.messages.Run(deltaTime);
 		if(Client.messages.size())
 		{
 			if((*Client.messages.begin()) == "_menu")
@@ -46,28 +56,35 @@ void OuterLoop(const char* ServerAddress)
 			}
 			else
 			{
-				thegame.msg = (*Client.messages.begin());
+				thegame.messages.AddMessage((*Client.messages.begin()), 10);
 				Client.messages.pop_front();
 			}
 		}
 		Render(&thegame);
 	}
-	thegame.msg = "Pick your color";
+	thegame.messages.AddMessage("Pick your color", 10);
 	SetupMenu(&thegame);			//sets up a list of colored tiles for the user to pick their color
+	startingPoint = GetTickCount();
 	while(!thegame.setup && !thegame.over && HandleMessages())
     {
+		deltaTime = GetTickCount() - startingPoint;
+		startingPoint = GetTickCount();
         Input(&InputData);
-        RunMenuFrame(&thegame, &InputData, &Client);
+        RunMenuFrame(&thegame, &InputData, &Client, deltaTime);
         Render(&thegame);
     }
 
+	startingPoint = GetTickCount();
+	thegame.messages.AddMessage("Test\nMessage", 10);
 	//main game loop
     while(HandleMessages() && !thegame.over)
     {
+		deltaTime = GetTickCount() - startingPoint;
+		startingPoint = GetTickCount();
         Input(&InputData);
-        RunFrame(&thegame, &InputData, &Client);
+        RunFrame(&thegame, &InputData, &Client, deltaTime);
         Render(&thegame);
     }
-	thegame.msg = "Waiting for goodbye from server.";
+	thegame.messages.AddMessage("Waiting for goodbye from server.", 10);
 	Render(&thegame);
 }

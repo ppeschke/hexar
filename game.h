@@ -5,6 +5,7 @@ using namespace std;
 
 #include "base.h"
 #include "Camera.h"
+#include "MessageQueue.h"
 
 class Game
 {
@@ -26,7 +27,7 @@ public:
 	base* sel1;
 	base* sel2;
 	char command;
-	string msg;
+	MessageQueue messages;
 	int peschkes;
 	Camera camera;
 };

@@ -237,11 +237,9 @@ void InitLight()
     d3ddev->SetMaterial(&material);    // set the globably-used material to &material
 }
 
-void drawText(const char* text)
+void drawTextAt(const char* text, RECT* textbox)
 {
-	static RECT textbox;
-	SetRect(&textbox, 0, 0, 256, 300); 
-	dxfont->DrawTextA(NULL, text, strlen(text), &textbox, DT_LEFT | DT_TOP, D3DCOLOR_ARGB(255, 255, 255, 0));
+	dxfont->DrawTextA(NULL, text, strlen(text), textbox, DT_LEFT | DT_TOP, D3DCOLOR_ARGB(255, 255, 255, 0));
 }
 
 void drawPeschkes(const char* peschkes)

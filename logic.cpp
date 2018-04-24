@@ -132,12 +132,14 @@ float randomNumber(float low, float high)
 	return low + ((float)rand() / (float)RAND_MAX) * (high - low);
 }
 
-void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
+void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, DWORD deltaTime)
 {
+	static DWORD timer = GetTickCount();
 	int i = -1, p = -1;
 	static base* hover = NULL;
 	bool commandComplete = false;
     // for every frame...
+	thegame->messages.Run(deltaTime);
 	thegame->arrow->onStep();
 	Client->locker.lock();
 	if(Client->messages.size() > 0)
@@ -149,7 +151,7 @@ void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 			doAction(thegame, a);
 		}
 		else
-			thegame->msg = (*msg);
+			thegame->messages.AddMessage(*msg, 5);
 		Client->messages.pop_front();
 	}
 	Client->locker.unlock();
@@ -232,7 +234,7 @@ void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 				thegame->sel2 = nullptr;
 			}
 			else
-				thegame->msg = "You must select a tile to move to!";
+				thegame->messages.AddMessage("You must select a tile to move to!", 3);
 		}
 		else
 		{
@@ -254,19 +256,11 @@ void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 					thegame->command = 'M';
 			}
 			else
-				thegame->msg = "You must select a tile or choose a command.";
+				thegame->messages.AddMessage("You must select a tile or choose a command.", 3);
 		}
 		
 		InputData->Clicked = false;
 	}
-
-	/*if(InputData->MouseButton)
-	{
-		if(getHovered(thegame, i, p))
-		{
-			base* hex = getHexagon(thegame, i, p);
-		}
-	}*/
 
 	if(InputData->Clicked && thegame->buttonTimer == 0 && !(thegame->command == ' ' || thegame->command == 'M'))
 	{
@@ -295,7 +289,7 @@ void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 				sendString = "_buy turret ";
 				break;
 			default:
-				thegame->msg = "Unsupported command!";
+				thegame->messages.AddMessage("Unsupported command!", 3);
 			}
 			if(thegame->command != ' ')
 			{
@@ -328,7 +322,7 @@ void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
     return;
 }
 
-void RunMenuFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
+void RunMenuFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, DWORD deltaTime)
 {
 	int i, p;
 	static base* hover = NULL;
@@ -344,6 +338,7 @@ void RunMenuFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client)
 		doAction(thegame, tempAction);
 	}
 	Client->locker.unlock();
+	thegame->messages.Run(deltaTime);
 	thegame->arrow->onStep();
 
 	thegame->camera.Run(InputData);
