@@ -17,5 +17,8 @@ public:
 
 private:
 	list<Message> messages;
+	string bigMessageString;
+	bool popped;
+	bool added;
 };
 

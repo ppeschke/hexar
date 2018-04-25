@@ -9,21 +9,16 @@ using namespace std;
 class Message
 {
 public:
-	Message(string msg, DWORD timer, unsigned int lines);
+	Message(string msg, float seconds);
 	~Message();
 
-	void Run(DWORD deltaTime);
+	void Run(float deltaTime);
 	bool isExpired();
 	string getMessage();
-	void setRect(int left, int top, int right, int bottom);
-	RECT* getRect();
-	unsigned int getLines();
 
 private:
 	string msg;
-	DWORD timer;
+	float secondsTimer;
 	bool expired;
-	RECT rect;
-	int lines;
 };
 
