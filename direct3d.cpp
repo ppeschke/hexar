@@ -51,6 +51,7 @@ void InitDirect3D(GAMEWINDOW* gw)
 
     d3ddev->SetRenderState(D3DRS_LIGHTING, TRUE);
     d3ddev->SetRenderState(D3DRS_ZENABLE, TRUE);
+	d3ddev->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);    // handle normals in scaling
 
     return;
 }
@@ -198,6 +199,8 @@ void DrawModel(MODEL* Model, float x, float y, float z, float scale, float rotat
 		tempMaterial->Diffuse.b = 1.0f;
 		break;
 	}
+	/*tempMaterial->Ambient = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	tempMaterial->Specular = D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f);*/
 
     for(DWORD index = 0; index < Model->numMaterials; index++)
     {
@@ -213,27 +216,33 @@ void DrawModel(MODEL* Model, float x, float y, float z, float scale, float rotat
 
 void InitLight()
 {
-    D3DLIGHT9 light;    // create the light struct
-	//D3DLIGHT9 light2;
     D3DMATERIAL9 material;    // create the material struct
 
-    ZeroMemory(&light, sizeof(light));    // clear out the light struct for use
-	//ZeroMemory(&light2, sizeof(light2));
+	D3DLIGHT9 light;    // create the light struct
+	ZeroMemory(&light, sizeof(light));    // clear out the light struct for use
     light.Type = D3DLIGHT_DIRECTIONAL;    // make the light type 'directional light'
-    light.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);    // set the light's color
-    light.Direction = D3DXVECTOR3(1.0f, -1.0f, -1.0f);
-	//light2.Type = D3DLIGHT_DIRECTIONAL;
-	//light2.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);    // set the light's color
-	//light2.Direction = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-
+    light.Diffuse = D3DXCOLOR(0.7f, 0.7f, 0.7f, 1.0f);    // set the light's color
+    light.Position = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+	light.Direction = D3DXVECTOR3(0.5f, -1.0f, -1.0f);
     d3ddev->SetLight(0, &light);    // send the light struct properties to light #0
     d3ddev->LightEnable(0, TRUE);    // turn on light #0
-	/*d3ddev->SetLight(1, &light2);
-	d3ddev->LightEnable(1, TRUE);*/
+
+	D3DLIGHT9 pointLight;    // create the light struct
+	ZeroMemory(&pointLight, sizeof(pointLight));    // clear out the light struct for use
+	pointLight.Type = D3DLIGHT_POINT;    // make the light type 'point light'
+	pointLight.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);    // set the light's color
+	pointLight.Position = D3DXVECTOR3(0.0f, 7.0f, 5.0f);
+	//pointLight.Direction = D3DXVECTOR3(0.5f, -1.0f, -1.0f);
+	pointLight.Range = 100.0f;
+	pointLight.Attenuation0 = 0.0f;    // no constant inverse attenuation
+	pointLight.Attenuation1 = 0.125f;    // only .125 inverse attenuation
+	pointLight.Attenuation2 = 0.0f;    // no square inverse attenuation
+	d3ddev->SetLight(1, &pointLight);    // send the light struct properties to light #0
+	d3ddev->LightEnable(1, TRUE);    // turn on light #1
 
     ZeroMemory(&material, sizeof(D3DMATERIAL9));    // clear out the struct for use
     material.Diffuse = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);    // set diffuse color to white
-    material.Ambient = D3DXCOLOR(0.7f, 0.7f, 0.7f, 1.0f);    // set ambient color to white
+    material.Ambient = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);    // set ambient color to white
 
     d3ddev->SetMaterial(&material);    // set the globably-used material to &material
 }
