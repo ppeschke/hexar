@@ -9,6 +9,7 @@ LPDIRECT3DDEVICE9 d3ddev = NULL;
 D3DPRESENT_PARAMETERS d3dpp;
 LPD3DXSPRITE d3dspt;
 LPD3DXFONT dxfont;
+LPD3DXFONT dxfontpeschkes;
 
 //direct3d.cpp prototypes
 void InitDirect3D(GAMEWINDOW* gw);
@@ -48,6 +49,8 @@ void InitDirect3D(GAMEWINDOW* gw)
                                 &d3ddev);
 	D3DXCreateFont(d3ddev, 20, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
                DEFAULT_QUALITY, DEFAULT_PITCH || FF_DONTCARE, L"Arial", &dxfont);
+	D3DXCreateFont(d3ddev, 28, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
+		DEFAULT_QUALITY, DEFAULT_PITCH || FF_DONTCARE, L"Arial", &dxfontpeschkes);
 
     d3ddev->SetRenderState(D3DRS_LIGHTING, TRUE);
     d3ddev->SetRenderState(D3DRS_ZENABLE, TRUE);
@@ -60,6 +63,7 @@ void InitDirect3D(GAMEWINDOW* gw)
 void CloseDirect3D()
 {
 	dxfont->Release();
+	dxfontpeschkes->Release();
     d3ddev->Release();
     d3d->Release();
 
@@ -255,15 +259,8 @@ void drawTextAt(const char* text, RECT* textbox)
 void drawPeschkes(const char* peschkes)
 {
 	static RECT textbox;
-	SetRect(&textbox, 256, 0, 384, 100);
-	dxfont->DrawTextA(NULL, peschkes, strlen(peschkes), &textbox, DT_LEFT | DT_TOP,
+	//SetRect(&textbox, 256, 0, 384, 100);
+	SetRect(&textbox, 224, 700, 1014, 758);
+	dxfontpeschkes->DrawTextA(NULL, peschkes, strlen(peschkes), &textbox, DT_RIGHT | DT_BOTTOM,
 					  D3DCOLOR_ARGB(255, 255, 255, 255));
-}
-
-int figureTextLength(const char* str)
-{
-	RECT box;
-	SetRect(&box, 0, 0, 256, 100);
-	dxfont->DrawTextA(NULL, str, strlen(str), &box, DT_LEFT | DT_TOP | DT_CALCRECT, D3DCOLOR_ARGB(255, 255, 255, 255));
-	return box.right;
 }
