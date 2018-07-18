@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <list>
+#include <fstream>
 using namespace std;
 
 #include "base.h"
@@ -30,4 +31,5 @@ public:
 	MessageQueue messages;
 	int peschkes;
 	Camera camera;
+	ofstream logFile;
 };

@@ -19,15 +19,13 @@ void MessageQueue::Render()
 {
 	RECT rect = {0, 0, 256, 300};
 	drawTextAt(bigMessageString.c_str(), &rect);
-	/*for(auto index = messages.begin(); index != messages.end(); ++index)
-		drawTextAt(index->getMessage().c_str(), index->getRect());*/
 }
 
-void MessageQueue::Run(DWORD deltaTime)
+void MessageQueue::Run(float seconds)
 {
 	//update timers for messages
 	for(auto index = messages.begin(); index != messages.end(); ++index)
-		index->Run(deltaTime / 1000.0f);
+		index->Run(seconds);
 
 	//remove expired messages
 	while(!messages.empty() && messages.front().isExpired())
@@ -49,6 +47,6 @@ void MessageQueue::Run(DWORD deltaTime)
 
 void MessageQueue::AddMessage(string msg, float seconds)
 {
-	messages.push_back(Message(msg, DWORD(seconds)));
+	messages.push_back(Message(msg, seconds));
 	added = true;
 }

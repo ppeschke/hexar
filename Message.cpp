@@ -11,10 +11,10 @@ Message::~Message()
 {
 }
 
-void Message::Run(float deltaTime)
+void Message::Run(float seconds)
 {
-	secondsTimer -= deltaTime;
-	if(secondsTimer <= 0)
+	secondsTimer -= seconds;
+	if(secondsTimer <= 0.0f)
 		expired = true;
 }
 
@@ -25,5 +25,5 @@ bool Message::isExpired()
 
 string Message::getMessage()
 {
-	return msg;
+	return msg;// +" " + to_string(secondsTimer);
 }

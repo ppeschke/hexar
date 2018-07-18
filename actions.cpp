@@ -45,19 +45,19 @@ void doAction(Game* thegame, action tempAction)
 		if(tempAction.item == "base")
 		{
 			base* hex = getHexagon(thegame, tempAction.int1, tempAction.int2);
-			base* temp = new outpost(hex->x, hex->y + 1.0f, hex->z, 0.3f, hex->c, GetModel(thegame, 2), tempAction.int1, tempAction.int2);
+			base* temp = new outpost(hex->x, hex->y, hex->z, 0.3f, hex->c, GetModel(thegame, 2), tempAction.int1, tempAction.int2);
 			thegame->objects.insert(thegame->objects.end(), temp);
 		}
 		else if(tempAction.item == "walker")
 		{
 			base* hex = getHexagon(thegame, tempAction.int1, tempAction.int2);
-			base* temp = new rotator(hex->x, hex->y + 1.0f, hex->z, 0.3f, hex->c, GetModel(thegame, 4), tempAction.int1, tempAction.int2);
+			base* temp = new rotator(hex->x, hex->y - 1.0f, hex->z, 0.3f, hex->c, GetModel(thegame, 4), tempAction.int1, tempAction.int2);
 			thegame->objects.insert(thegame->objects.end(), temp);
 		}
 		else if(tempAction.item == "turret")
 		{
 			base* hex = getHexagon(thegame, tempAction.int1, tempAction.int2);
-			base* temp = new rotator(hex->x, hex->y + 1.0f, hex->z, 0.7f, hex->c, GetModel(thegame, 3), tempAction.int1, tempAction.int2);
+			base* temp = new rotator(hex->x, hex->y - 1.0f, hex->z, 0.7f, hex->c, GetModel(thegame, 3), tempAction.int1, tempAction.int2);
 			thegame->objects.insert(thegame->objects.end(), temp);
 		}
 	}

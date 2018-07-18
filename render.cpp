@@ -4,7 +4,6 @@
 // Direct3D.cpp
 void StartRender();
 void EndRender();
-void drawText(const char* text);
 void drawPeschkes(const char* text);
 void LoadModel(MODEL* Model, LPCTSTR File, int modelNum);
 void SetCamera();

@@ -9,7 +9,7 @@ public:
 	base(float x, float y, float z, float scale, color c, MODEL* m);
 	virtual ~base(void);
 
-	virtual void onStep() = 0;
+	virtual void onStep(float seconds) = 0;
 	virtual bool coords(int, int);
 	virtual bool rcoords(int, int);
 

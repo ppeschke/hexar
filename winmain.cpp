@@ -22,7 +22,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
     InitDirect3D(&gw);
     InitDirectInput(hInstance, &gw);
 
-    OuterLoop("10.44.0.144");
+    OuterLoop("10.44.0.37");
 
     CloseDirect3D();
     CloseDirectInput();

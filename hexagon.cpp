@@ -11,7 +11,7 @@ hexagon::~hexagon(void)
 }
 
 
-void hexagon::onStep()
+void hexagon::onStep(float seconds)
 {
 }
 

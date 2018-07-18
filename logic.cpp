@@ -132,15 +132,12 @@ float randomNumber(float low, float high)
 	return low + ((float)rand() / (float)RAND_MAX) * (high - low);
 }
 
-void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, DWORD deltaTime)
+void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, float seconds)
 {
-	static DWORD timer = GetTickCount();
 	int i = -1, p = -1;
-	static base* hover = NULL;
+	static base* hover = nullptr;
 	bool commandComplete = false;
-    // for every frame...
-	thegame->messages.Run(deltaTime);
-	thegame->arrow->onStep();
+
 	Client->locker.lock();
 	if(Client->messages.size() > 0)
 	{
@@ -155,6 +152,7 @@ void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, DWORD 
 		Client->messages.pop_front();
 	}
 	Client->locker.unlock();
+	thegame->messages.Run(seconds);
 
 	if(InputData->Esc)
 		thegame->over = true;
@@ -165,8 +163,8 @@ void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, DWORD 
 			thegame->sel1->y = 0.0f;
 		if(thegame->sel2)
 			thegame->sel2->y = 0.0f;
-		thegame->sel1 = NULL;
-		thegame->sel2 = NULL;
+		thegame->sel1 = nullptr;
+		thegame->sel2 = nullptr;
 		thegame->command = 'B';
 		thegame->buttonTimer = 10;
 	}
@@ -176,8 +174,8 @@ void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, DWORD 
 			thegame->sel1->y = 0.0f;
 		if(thegame->sel2)
 			thegame->sel2->y = 0.0f;
-		thegame->sel1 = NULL;
-		thegame->sel2 = NULL;
+		thegame->sel1 = nullptr;
+		thegame->sel2 = nullptr;
 		thegame->command = 'T';
 		thegame->buttonTimer = 10;
 	}
@@ -187,8 +185,8 @@ void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, DWORD 
 			thegame->sel1->y = 0.0f;
 		if(thegame->sel2)
 			thegame->sel2->y = 0.0f;
-		thegame->sel1 = NULL;
-		thegame->sel2 = NULL;
+		thegame->sel1 = nullptr;
+		thegame->sel2 = nullptr;
 		thegame->command = 'W';
 		thegame->buttonTimer = 10;
 	}
@@ -198,8 +196,8 @@ void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, DWORD 
 			thegame->sel1->y = 0.0f;
 		if(thegame->sel2)
 			thegame->sel2->y = 0.0f;
-		thegame->sel1 = NULL;
-		thegame->sel2 = NULL;
+		thegame->sel1 = nullptr;
+		thegame->sel2 = nullptr;
 		thegame->command = 'E';
 		thegame->buttonTimer = 10;
 	}
@@ -207,14 +205,13 @@ void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, DWORD 
 	thegame->arrow->x -= InputData->MouseX / 20.0f;
 	thegame->arrow->z += InputData->MouseY / 20.0f;
 
-	base* prevHover;
-	prevHover = hover;
+	base* prevHover = hover;
 	//may set i and p
 	getHovered(thegame, i, p);
 	if(i != -1 && p != -1)
 		if(hover = getHexagon(thegame, i, p))
 			hover->y = 1.0f;
-	if(prevHover && prevHover != hover)
+	if(prevHover != nullptr && prevHover != hover)
 		prevHover->y = 0.0f;
 
 	//mouse only commands (land grab and move actions)
@@ -317,12 +314,12 @@ void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, DWORD 
 
 	for(list<base*>::iterator index = thegame->objects.begin(); index != thegame->objects.end(); ++index)
 	{
-		(*index)->onStep();
+		(*index)->onStep(seconds);
 	}
     return;
 }
 
-void RunMenuFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, DWORD deltaTime)
+void RunMenuFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, float seconds)
 {
 	int i, p;
 	static base* hover = NULL;
@@ -334,12 +331,12 @@ void RunMenuFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, DW
 	{
 		tempAction = parseMessage(thegame, *(Client->messages.begin()));
 		Client->messages.pop_front();
-		debugFile << "tempAction: " << tempAction.item << ", " << tempAction.name << endl;
+		//debugFile << "tempAction: " << tempAction.item << ", " << tempAction.name << endl;
 		doAction(thegame, tempAction);
 	}
 	Client->locker.unlock();
-	thegame->messages.Run(deltaTime);
-	thegame->arrow->onStep();
+	thegame->messages.Run(seconds);
+	thegame->arrow->onStep(seconds);
 
 	thegame->camera.Run(InputData);
 
@@ -380,6 +377,7 @@ void RunMenuFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, DW
 
 	if(thegame->buttonTimer > 0)
 		thegame->buttonTimer -= 1;
+
 	return;
 }
 

@@ -12,11 +12,11 @@ rotator::~rotator(void)
 {
 }
 
-void rotator::onStep()
+void rotator::onStep(float seconds)
 {
-	rotation += 0.03f;
+	rotation += PI * seconds;
 	if(rotation > 2 * PI)
-		rotation = 0.0f;
+		rotation -= 2.0f * PI;
 }
 
 bool rotator::rcoords(int _i, int _p)

@@ -11,7 +11,7 @@ public:
 	~MessageQueue();
 
 	void Render();
-	void Run(DWORD deltaTime);
+	void Run(float deltaTime);
 
 	void AddMessage(string msg, float seconds);
 
