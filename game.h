@@ -20,6 +20,7 @@ public:
 	list<MODEL*> models;
 	bool over;
 	bool setup;
+	bool typing;
 	int playerNum;
 	color playercolors[6];
 	color playerColor;
@@ -32,4 +33,5 @@ public:
 	int peschkes;
 	Camera camera;
 	ofstream logFile;
+	string chatString;
 };

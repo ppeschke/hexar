@@ -1,5 +1,5 @@
 #include "inputdata.h"
-#include "game.h"
+#include "InputProcessor.h"
 #include "NetworkClient.h"
 
 void LoadGraphics(Game* thegame);
@@ -17,19 +17,20 @@ void OuterLoop(const char* ServerAddress)
 	Game thegame;
 	thegame.logFile.open("log.txt");
 	INPUTDATA InputData;
+	InputProcessor in(&thegame);
 	NetworkClient Client(ServerAddress);
 	LoadGraphics(&thegame);
-	Input(&InputData);
 	float seconds = updateTime();
 
 	//connecting loop
 	thegame.messages.AddMessage("connecting with " + string(ServerAddress), 5.0f);
 	float connectionAttemptTimer = seconds;
 	float prev = 0.0;
-	while(!Client.Connected() && !InputData.Esc)
+	while(!Client.Connected() && !thegame.over)
 	{
 		seconds = updateTime();
 		connectionAttemptTimer += seconds;
+		in.ProcessInputs();
 		Input(&InputData);
 		thegame.messages.Run(seconds);
 		if((connectionAttemptTimer - 3.0f) >= prev)	//it's been more than a second
@@ -45,9 +46,10 @@ void OuterLoop(const char* ServerAddress)
 
 	//waiting for players loop (practically nothing displayed on screen)
 	thegame.messages.AddMessage("connected, waiting for other players", 5.0f);
-	while(true)
+	while(!thegame.over)
 	{
 		seconds = updateTime();
+		in.ProcessInputs();
 		Input(&InputData);
 		thegame.messages.Run(seconds);
 		if(Client.messages.size())
@@ -72,6 +74,7 @@ void OuterLoop(const char* ServerAddress)
 	while(!thegame.setup && !thegame.over && HandleMessages())
     {
 		seconds = updateTime();
+		in.ProcessInputs();
         Input(&InputData);
         RunMenuFrame(&thegame, &InputData, &Client, seconds);
         Render(&thegame);
@@ -81,6 +84,7 @@ void OuterLoop(const char* ServerAddress)
     while(HandleMessages() && !thegame.over)
     {
 		seconds = updateTime();
+		in.ProcessInputs();
         Input(&InputData);
         RunFrame(&thegame, &InputData, &Client, seconds);
         Render(&thegame);

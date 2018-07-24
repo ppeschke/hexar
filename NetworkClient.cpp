@@ -1,5 +1,4 @@
 #include <fstream>
-using namespace std;
 #include "NetworkClient.h"
 
 #pragma comment(lib, "Ws2_32.lib")
@@ -8,7 +7,7 @@ ofstream fout;
 
 NetworkClient::NetworkClient(const char* serverAddress)
 {
-	fout.open("networkClient.log");
+	fout.open("networkClient.log", ios::out);
 	strcpy_s(serverIP, serverAddress);
 	port = 17000;
 	SizeInt = sizeof(ServerAddress);

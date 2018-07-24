@@ -5,12 +5,15 @@ Game::Game(void)
 {
 	over = false;
 	setup = false;
+	typing = false;
 	buttonTimer = 0;
 	sel1 = NULL;
 	sel2 = NULL;
 	command = ' ';
 	peschkes = 0;
 	playerColor = white;
+	chatString = "";
+	arrow = nullptr;
 }
 
 Game::~Game(void)

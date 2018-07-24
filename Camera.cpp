@@ -18,16 +18,7 @@ Camera::~Camera()
 
 void Camera::Run(INPUTDATA* InputData)
 {
-	if(InputData->MoveUp)
-		camYAngle += 0.03f;
-	if(InputData->MoveDown)
-		camYAngle -= 0.03f;
-	if(InputData->MoveLeft)
-		camXAngle -= 0.03f;
-	if(InputData->MoveRight)
-		camXAngle += 0.03f;
-
-	if(camXAngle > 2 * PI)
+	/*if(camXAngle > 2 * PI)
 		camXAngle = 0.0f;
 	if(camXAngle < 0.0f)
 		camXAngle = 2 * PI;
@@ -40,7 +31,7 @@ void Camera::Run(INPUTDATA* InputData)
 	if(camZoom < 20.0f)
 		camZoom = 20.0f;
 	if(camZoom > 90.0f)
-		camZoom = 90.0f;
+		camZoom = 90.0f;*/
 
 	AdjustCamera((float)cos((double)camXAngle) * camZoom * (float)cos((double)camYAngle),
 		(float)sin((double)camYAngle) * camZoom,

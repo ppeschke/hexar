@@ -340,9 +340,6 @@ void RunMenuFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, fl
 
 	thegame->camera.Run(InputData);
 
-	thegame->arrow->x -= InputData->MouseX / 20.0f;
-	thegame->arrow->z += InputData->MouseY / 20.0f;
-
 	base* hovtemp = hover;
 	if(getHovered(thegame, i, p))
 	{
