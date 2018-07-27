@@ -5,10 +5,11 @@
 void LoadGraphics(Game* thegame);
 bool HandleMessages();
 void SetupMenu(Game* thegame);
-void Input(INPUTDATA* InputData);
+//void Input(INPUTDATA* InputData);
+void HandleInputs(list<InputEvent>* ev, Game* thegame);
 void Render(Game* thegame);
-void RunMenuFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, float seconds);
-void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, float seconds);
+void RunMenuFrame(Game* thegame, NetworkClient* Client, float seconds);
+void RunFrame(Game* thegame, NetworkClient* Client, float seconds);
 inline float updateTime();
 
 // The Outer Loop
@@ -16,8 +17,9 @@ void OuterLoop(const char* ServerAddress)
 {
 	Game thegame;
 	thegame.logFile.open("log.txt");
-	INPUTDATA InputData;
+//	INPUTDATA InputData;
 	InputProcessor in(&thegame);
+	list<InputEvent>* events = in.getEvents();
 	NetworkClient Client(ServerAddress);
 	LoadGraphics(&thegame);
 	float seconds = updateTime();
@@ -31,7 +33,8 @@ void OuterLoop(const char* ServerAddress)
 		seconds = updateTime();
 		connectionAttemptTimer += seconds;
 		in.ProcessInputs();
-		Input(&InputData);
+		//Input(&InputData);
+		HandleInputs(events, &thegame);
 		thegame.messages.Run(seconds);
 		if((connectionAttemptTimer - 3.0f) >= prev)	//it's been more than a second
 		{
@@ -50,7 +53,8 @@ void OuterLoop(const char* ServerAddress)
 	{
 		seconds = updateTime();
 		in.ProcessInputs();
-		Input(&InputData);
+		HandleInputs(events, &thegame);
+		//Input(&InputData);
 		thegame.messages.Run(seconds);
 		if(Client.messages.size())
 		{
@@ -75,8 +79,9 @@ void OuterLoop(const char* ServerAddress)
     {
 		seconds = updateTime();
 		in.ProcessInputs();
-        Input(&InputData);
-        RunMenuFrame(&thegame, &InputData, &Client, seconds);
+		HandleInputs(events, &thegame);
+        //Input(&InputData);
+        RunMenuFrame(&thegame, &Client, seconds);
         Render(&thegame);
     }
 
@@ -85,8 +90,9 @@ void OuterLoop(const char* ServerAddress)
     {
 		seconds = updateTime();
 		in.ProcessInputs();
-        Input(&InputData);
-        RunFrame(&thegame, &InputData, &Client, seconds);
+		HandleInputs(events, &thegame);
+        //Input(&InputData);
+        RunFrame(&thegame, &Client, seconds);
         Render(&thegame);
     }
 	thegame.messages.AddMessage("Waiting for goodbye from server.", 5.0f);
@@ -101,4 +107,39 @@ float updateTime()
 	deltaTime = GetTickCount() - startingPoint;
 	startingPoint = GetTickCount();
 	return deltaTime / 1000.0f;
+}
+
+void HandleInputs(list<InputEvent>* ev, Game* thegame)
+{
+	while(!ev->empty())
+	{
+		InputEvent e = (*ev->begin());
+		ev->pop_front();
+		if(e.getType() == keyboard)
+		{
+			switch(e.getPressed())
+			{
+			case (char)27:
+				thegame->over = true;
+				break;
+			default:
+				thegame->over = true;
+			}
+		}
+		else
+		{
+			if(e.getPressed() == '!')
+			{
+				if(thegame->arrow != nullptr)
+				{
+					thegame->arrow->x -= e.getX() / 20.0f;	//implement these later!
+					thegame->arrow->z += e.getZ() / 20.0f;
+				}
+			}
+			else
+			{
+				//click
+			}
+		}
+	}
 }

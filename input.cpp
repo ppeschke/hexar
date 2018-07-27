@@ -38,4 +38,4 @@ void Input(INPUTDATA* InputData)
 	}
 	InputData->Clicked = Clicked;
     return;
-} 
+}

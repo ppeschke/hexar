@@ -132,7 +132,7 @@ float randomNumber(float low, float high)
 	return low + ((float)rand() / (float)RAND_MAX) * (high - low);
 }
 
-void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, float seconds)
+void RunFrame(Game* thegame, NetworkClient* Client, float seconds)
 {
 	int i = -1, p = -1;
 	static base* hover = nullptr;
@@ -154,10 +154,8 @@ void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, float 
 	Client->locker.unlock();
 	thegame->messages.Run(seconds);
 
-	if(InputData->Esc)
-		thegame->over = true;
-	thegame->camera.Run(InputData);
-	if(thegame->buttonTimer == 0 && InputData->B)
+	thegame->camera.Run();
+	/*if(thegame->buttonTimer == 0 && InputData->B)
 	{
 		if(thegame->sel1)
 			thegame->sel1->y = 0.0f;
@@ -306,7 +304,7 @@ void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, float 
 			Client->Send("_endturn");
 			thegame->command = ' ';
 		}
-	}
+	}*/
 
 	
 	if(thegame->buttonTimer > 0)
@@ -319,7 +317,7 @@ void RunFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, float 
     return;
 }
 
-void RunMenuFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, float seconds)
+void RunMenuFrame(Game* thegame, NetworkClient* Client, float seconds)
 {
 	int i, p;
 	static base* hover = NULL;
@@ -338,7 +336,7 @@ void RunMenuFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, fl
 	thegame->messages.Run(seconds);
 	thegame->arrow->onStep(seconds);
 
-	thegame->camera.Run(InputData);
+	thegame->camera.Run();
 
 	base* hovtemp = hover;
 	if(getHovered(thegame, i, p))
@@ -357,7 +355,7 @@ void RunMenuFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, fl
 		hover = NULL;
 	}
 
-	if(InputData->Clicked)
+	/*if(InputData->Clicked)
 	{
 		thegame->buttonTimer = 10;
 		if(getHovered(thegame, i, p))
@@ -368,7 +366,7 @@ void RunMenuFrame(Game* thegame, INPUTDATA* InputData, NetworkClient* Client, fl
 			Client->Send(msg.c_str());
 		}
 		InputData->Clicked = false;
-	}
+	}*/
 	if(sel1)
 		sel1->y = 2.0f;
 

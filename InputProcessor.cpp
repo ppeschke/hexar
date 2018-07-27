@@ -39,7 +39,7 @@ void InputProcessor::ProcessInputs()
 {
 	static DIMOUSESTATE Mouse;
 	static bool ClickStarted = false;
-	GetKeys(&Keys[0]);
+	//mouse
 	GetMouse(&Mouse);
 	x = (float)Mouse.lX;
 	y = (float)Mouse.lY;
@@ -52,94 +52,99 @@ void InputProcessor::ProcessInputs()
 		Clicked = true;
 		ClickStarted = false;
 	}
+	events.push_back(InputEvent(mouse, '!', x / 20.0f, y / 20.0f));
+	if(Clicked)
+	{
+		events.push_back(InputEvent(mouse, 'c', 0.0f, 0.0f));
+		//handled
+		Clicked = false;
+	}
+
+	//keyboard
+	GetKeys(&Keys[0]);
+	if(prevKeys[DIK_CAPITAL] != Keys[DIK_CAPITAL])	//if state is different from last frame
+		caps = !caps;								//toggle state
 	for(int k = 0; k <= 0x52; ++k)
 	{
-		if(!Keys[k] && prevKeys[k])	//if key was pressed last frame, but let up this frame,
+		if(prevKeys[k] && !Keys[k])	//if key was pressed last frame, but let up this frame,
 		{
-			events.push_back(k);
+			bool shift = Keys[DIK_LSHIFT] || Keys[DIK_RSHIFT];
+			events.push_back(TranslateKeyboardEvent(k, shift));
 		}
 	}
-	ProcessEvents();
+	
 	//swap the pointers
 	BYTE* temp = Keys;
 	Keys = prevKeys;
 	prevKeys = temp;
 }
 
-void InputProcessor::ProcessEvents()
+InputEvent InputProcessor::TranslateKeyboardEvent(short code, bool shift)
 {
-	bool shift = Keys[DIK_LSHIFT] || Keys[DIK_RSHIFT];
-	static bool caps = false;
-	if(thegame->arrow != nullptr)
+	switch(code)
 	{
-		thegame->arrow->x -= x / 20.0f;
-		thegame->arrow->z += y / 20.0f;
-	}
-	if(Clicked)
-	{
-		//handled
-		Clicked = false;
-	}
-	while(!events.empty())
-	{
-		short code = (*events.begin());
-		events.pop_front();
-		switch(code)
+	case DIK_ESCAPE:
+		return InputEvent(keyboard, (char)27, 0.0f, 0.0f);
+		break;
+	case DIK_BACK:
+		return InputEvent(keyboard, (char)8, 0.0f, 0.0f);
+		/*if(thegame->typing)
+			if(thegame->chatString != "")
+				thegame->chatString = thegame->chatString.substr(0, thegame->chatString.size() - 1);*/
+		break;
+	case DIK_TAB:
+		return InputEvent(keyboard, (char)9, 0.0f, 0.0f);
+		//thegame->typing = !thegame->typing;
+		break;
+	case DIK_RETURN:
+	case DIK_NUMPADENTER:
+		return InputEvent(keyboard, (char)10, 0.0f, 0.0f);
+		/*if(thegame->typing)
 		{
-		case DIK_ESCAPE:
-			thegame->over = true;
-			break;
-		case DIK_BACK:
-			if(thegame->typing)
-				if(thegame->chatString != "")
-					thegame->chatString = thegame->chatString.substr(0, thegame->chatString.size() - 1);
-			break;
-		case DIK_TAB:
-			thegame->typing = !thegame->typing;
-			break;
-		case DIK_RETURN:
-		case DIK_NUMPADENTER:
-			if(thegame->typing)
-			{
-				thegame->messages.AddMessage(thegame->chatString, 1.0f);
-				thegame->chatString = "";
-				thegame->typing = false;
-			}
-			break;
-		case DIK_LSHIFT://we don't need to process shift key events, just skip them if they occur
-		case DIK_RSHIFT://we're only interested in instantaneous shift key presses
-			continue;
-			break;
-		case DIK_CAPITAL:
-			caps = !caps;
-			break;
-		case DIK_DIVIDE:
-			break;
-		default:
-			char c = characterMap[(shift? code + 0x52:code)];
-			if(thegame->typing)
-			{
-				if(caps && isalpha(c))
-					c = toupper(c);
-				thegame->chatString += c;
-			}
-			else
-			{
-				switch(c)
-				{
-				case 'g':
-					break;
-				case 'b':
-					break;
-				case 'w':
-					break;
-				case 't':
-					break;
-				default:
-					break;
-				}
-			}
-			break;
+			thegame->messages.AddMessage(thegame->chatString, 1.0f);
+			thegame->chatString = "";
+			thegame->typing = false;
+		}*/
+		break;
+	case DIK_LSHIFT://we don't need to process shift key events, just skip them if they occur
+	case DIK_RSHIFT://we're only interested in instantaneous shift key presses
+	case DIK_CAPITAL:
+		break;
+		break;
+	case DIK_DIVIDE:
+		return InputEvent(keyboard, '/', 0.0f, 0.0f);
+		break;
+	default:
+		char c = characterMap[(shift? code + 0x52:code)];
+		return InputEvent(keyboard, c, 0.0f, 0.0f);
+		/*if(thegame->typing)
+		{
+			if(caps && isalpha(c))
+				c = toupper(c);
+			thegame->chatString += c;
 		}
+		else
+		{
+			switch(c)
+			{
+			case 'g':
+				break;
+			case 'b':
+				break;
+			case 'w':
+				break;
+			case 't':
+				break;
+			default:
+				break;
+			}
+		}*/
+		break;
 	}
+	return InputEvent(keyboard, (char)27, 0.0f, 0.0f);
+}
+
+list<InputEvent>* InputProcessor::getEvents()
+{
+	return &this->events;
 }

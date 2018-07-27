@@ -16,7 +16,7 @@ Camera::~Camera()
 {
 }
 
-void Camera::Run(INPUTDATA* InputData)
+void Camera::Run()
 {
 	/*if(camXAngle > 2 * PI)
 		camXAngle = 0.0f;

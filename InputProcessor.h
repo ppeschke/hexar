@@ -1,6 +1,6 @@
 #ifndef INPUTPROCESSOR_H
 #define INPUTPROCESSOR_H
-
+#include "InputEvent.h"
 #include "game.h"
 
 class InputProcessor
@@ -10,7 +10,8 @@ public:
 	~InputProcessor();
 
 	void ProcessInputs();
-	void ProcessEvents();
+	InputEvent TranslateKeyboardEvent(short code, bool shift);
+	list<InputEvent>* getEvents();
 
 private:
 	BYTE* Keys;
@@ -19,7 +20,8 @@ private:
 	float mouseDownX, mouseDownY;
 	Game* thegame;
 	bool Clicked;
-	list<short> events;
+	bool caps;
+	list<InputEvent> events;
 };
 
 #endif
