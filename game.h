@@ -7,11 +7,13 @@ using namespace std;
 #include "base.h"
 #include "Camera.h"
 #include "MessageQueue.h"
+#include "MenuInputHandler.h"
+#include "GameInputHandler.h"
 
 class Game
 {
 public:
-	Game(void);
+	Game(NetworkClient* c);
 	~Game(void);
 
 	void CleanObjs();
@@ -34,4 +36,6 @@ public:
 	Camera camera;
 	ofstream logFile;
 	string chatString;
+	MenuInputHandler mih;
+	GameInputHandler gih;
 };

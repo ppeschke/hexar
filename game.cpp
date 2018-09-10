@@ -1,7 +1,7 @@
 #include "game.h"
 #include "model.h"
 
-Game::Game(void)
+Game::Game(NetworkClient* c) : mih(this, c), gih(this, c)
 {
 	over = false;
 	setup = false;

@@ -6,7 +6,7 @@ void LoadGraphics(Game* thegame);
 bool HandleMessages();
 void SetupMenu(Game* thegame);
 //void Input(INPUTDATA* InputData);
-void HandleInputs(list<InputEvent>* ev, Game* thegame);
+void HandleInputs(list<InputEvent>* ev, Game* thegame, InputHandler* h);
 void Render(Game* thegame);
 void RunMenuFrame(Game* thegame, NetworkClient* Client, float seconds);
 void RunFrame(Game* thegame, NetworkClient* Client, float seconds);
@@ -15,12 +15,11 @@ inline float updateTime();
 // The Outer Loop
 void OuterLoop(const char* ServerAddress)
 {
-	Game thegame;
+	NetworkClient Client(ServerAddress);
+	Game thegame(&Client);
 	thegame.logFile.open("log.txt");
-//	INPUTDATA InputData;
 	InputProcessor in(&thegame);
 	list<InputEvent>* events = in.getEvents();
-	NetworkClient Client(ServerAddress);
 	LoadGraphics(&thegame);
 	float seconds = updateTime();
 
@@ -34,7 +33,7 @@ void OuterLoop(const char* ServerAddress)
 		connectionAttemptTimer += seconds;
 		in.ProcessInputs();
 		//Input(&InputData);
-		HandleInputs(events, &thegame);
+		HandleInputs(events, &thegame, &thegame.mih);
 		thegame.messages.Run(seconds);
 		if((connectionAttemptTimer - 3.0f) >= prev)	//it's been more than a second
 		{
@@ -53,7 +52,7 @@ void OuterLoop(const char* ServerAddress)
 	{
 		seconds = updateTime();
 		in.ProcessInputs();
-		HandleInputs(events, &thegame);
+		HandleInputs(events, &thegame, &thegame.mih);
 		//Input(&InputData);
 		thegame.messages.Run(seconds);
 		if(Client.messages.size())
@@ -79,7 +78,7 @@ void OuterLoop(const char* ServerAddress)
     {
 		seconds = updateTime();
 		in.ProcessInputs();
-		HandleInputs(events, &thegame);
+		HandleInputs(events, &thegame, &thegame.mih);
         //Input(&InputData);
         RunMenuFrame(&thegame, &Client, seconds);
         Render(&thegame);
@@ -90,7 +89,7 @@ void OuterLoop(const char* ServerAddress)
     {
 		seconds = updateTime();
 		in.ProcessInputs();
-		HandleInputs(events, &thegame);
+		HandleInputs(events, &thegame, &thegame.gih);
         //Input(&InputData);
         RunFrame(&thegame, &Client, seconds);
         Render(&thegame);
@@ -109,7 +108,7 @@ float updateTime()
 	return deltaTime / 1000.0f;
 }
 
-void HandleInputs(list<InputEvent>* ev, Game* thegame)
+void HandleInputs(list<InputEvent>* ev, Game* thegame, InputHandler* h)
 {
 	while(!ev->empty())
 	{
@@ -117,28 +116,18 @@ void HandleInputs(list<InputEvent>* ev, Game* thegame)
 		ev->pop_front();
 		if(e.getType() == keyboard)
 		{
-			switch(e.getPressed())
-			{
-			case (char)27:
-				thegame->over = true;
-				break;
-			default:
-				thegame->over = true;
-			}
+			h->handleButtonPress(e);
 		}
 		else
 		{
 			if(e.getPressed() == '!')
 			{
-				if(thegame->arrow != nullptr)
-				{
-					thegame->arrow->x -= e.getX() / 20.0f;	//implement these later!
-					thegame->arrow->z += e.getZ() / 20.0f;
-				}
+				h->handleMouseMove(e);
 			}
 			else
 			{
-				//click
+				h->handleMouseClick(e);
+
 			}
 		}
 	}
