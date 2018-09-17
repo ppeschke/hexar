@@ -11,11 +11,15 @@ void Render(Game* thegame);
 void RunMenuFrame(Game* thegame, NetworkClient* Client, float seconds);
 void RunFrame(Game* thegame, NetworkClient* Client, float seconds);
 inline float updateTime();
+NetworkClient* getClient();
+
+NetworkClient* theClient;
 
 // The Outer Loop
 void OuterLoop(const char* ServerAddress)
 {
 	NetworkClient Client(ServerAddress);
+	theClient = &Client;
 	Game thegame(&Client);
 	thegame.logFile.open("log.txt");
 	InputProcessor in(&thegame);
@@ -97,6 +101,11 @@ void OuterLoop(const char* ServerAddress)
 	thegame.messages.AddMessage("Waiting for goodbye from server.", 5.0f);
 	Render(&thegame);
 	thegame.logFile.close();
+}
+
+NetworkClient* getClient()
+{
+	return theClient;
 }
 
 float updateTime()

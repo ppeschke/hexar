@@ -4,6 +4,7 @@
 
 bool getHovered(Game* thegame, int& i, int& p);
 base* getHexagon(Game* thegame, int i, int p);
+NetworkClient* getClient();
 
 MenuInputHandler::MenuInputHandler(Game* g, NetworkClient* c) : InputHandler(g, c)
 {
@@ -31,7 +32,28 @@ void MenuInputHandler::handleButtonPress(InputEvent e)
 {
 	switch (e.getPressed())
 	{
-	case (char)27:
-		thegame->over = true;
+	case (char)27:	//escape
+		if(thegame->typing)
+			thegame->typing = false;
+		else
+			thegame->over = true;
+		break;
+	case (char)9:	//tab
+		thegame->typing = !thegame->typing;
+		break;
+	case (char)8:	//backspace
+		if(thegame->typing && thegame->chatString.size() > 0)
+			thegame->chatString = thegame->chatString.substr(thegame->chatString.size() - 1);
+		break;
+	case (char)10:	//line feed
+	case (char)13:	//carriage return
+		getClient()->Send(thegame->chatString.c_str());
+		thegame->chatString = "";
+		thegame->typing = false;
+		break;
+	default:
+		if(thegame->typing)
+			thegame->chatString += e.getPressed();
+		break;
 	}
 }
