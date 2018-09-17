@@ -11,6 +11,7 @@ void AdjustCamera(float x, float y, float z);
 void InitLight();
 void DrawModel(MODEL* Model, float x, float y, float z, float scale, float rotation, color c);
 string toString(int);
+void drawChat(string msg);
 
 //render.cpp
 void Render(Game* thegame);
@@ -51,6 +52,8 @@ void Render(Game* thegame)
 	if(thegame->setup)
 		drawPeschkes((string("Peschkes: ") + toString(thegame->peschkes)).c_str());
 	thegame->messages.Render();
+	if(thegame->typing)
+		drawChat(thegame->chatString);
     EndRender();
 
     return;

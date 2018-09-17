@@ -1,5 +1,8 @@
 #include <atlbase.h>
 #include <stdlib.h>
+#include<string>
+using namespace std;
+
 #include "gamewindow.h"
 #include "model.h"
 #include "color.h"
@@ -21,6 +24,7 @@ void SetCamera();
 void AdjustCamera(float x, float y, float z);
 void DrawModel(MODEL* Model, float x, float y, float z, float scale, float rotation, color c);
 void InitLight();
+void drawChat(string msg);
 
 // include the Direct3D Library files so you don't have to put them in the project settings
 //(the paths to these do have to be included in the lib directories for the compiler though)
@@ -256,10 +260,15 @@ void drawTextAt(const char* text, RECT* textbox)
 	dxfont->DrawTextA(NULL, text, strlen(text), textbox, DT_LEFT | DT_TOP | DT_WORDBREAK, D3DCOLOR_ARGB(255, 255, 255, 0));
 }
 
+void drawChat(string msg)
+{
+	static RECT textbox{ 0, 576, 341, 1024 };
+	dxfont->DrawTextA(NULL, msg.c_str(), msg.size(), &textbox, DT_LEFT | DT_TOP | DT_WORDBREAK, D3DCOLOR_ARGB(255, 255, 255, 0));
+}
+
 void drawPeschkes(const char* peschkes)
 {
 	static RECT textbox;
-	//SetRect(&textbox, 256, 0, 384, 100);
 	SetRect(&textbox, 224, 700, 1014, 758);
 	dxfontpeschkes->DrawTextA(NULL, peschkes, strlen(peschkes), &textbox, DT_RIGHT | DT_BOTTOM,
 					  D3DCOLOR_ARGB(255, 255, 255, 255));
