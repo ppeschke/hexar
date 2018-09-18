@@ -2,6 +2,7 @@
 #include "game.h"
 #include "NetworkClient.h"
 
+string toString(int);
 bool getHovered(Game* thegame, int& i, int& p);
 base* getHexagon(Game* thegame, int i, int p);
 NetworkClient* getClient();
@@ -43,7 +44,7 @@ void MenuInputHandler::handleButtonPress(InputEvent e)
 		break;
 	case (char)8:	//backspace
 		if(thegame->typing && thegame->chatString.size() > 0)
-			thegame->chatString = thegame->chatString.substr(thegame->chatString.size() - 1);
+			thegame->chatString = thegame->chatString.substr(0, thegame->chatString.size() - 1);
 		break;
 	case (char)10:	//line feed
 	case (char)13:	//carriage return

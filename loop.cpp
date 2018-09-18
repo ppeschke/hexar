@@ -36,7 +36,6 @@ void OuterLoop(const char* ServerAddress)
 		seconds = updateTime();
 		connectionAttemptTimer += seconds;
 		in.ProcessInputs();
-		//Input(&InputData);
 		HandleInputs(events, &thegame, &thegame.mih);
 		thegame.messages.Run(seconds);
 		if((connectionAttemptTimer - 3.0f) >= prev)	//it's been more than a second
@@ -57,7 +56,6 @@ void OuterLoop(const char* ServerAddress)
 		seconds = updateTime();
 		in.ProcessInputs();
 		HandleInputs(events, &thegame, &thegame.mih);
-		//Input(&InputData);
 		thegame.messages.Run(seconds);
 		if(Client.messages.size())
 		{
@@ -83,7 +81,6 @@ void OuterLoop(const char* ServerAddress)
 		seconds = updateTime();
 		in.ProcessInputs();
 		HandleInputs(events, &thegame, &thegame.mih);
-        //Input(&InputData);
         RunMenuFrame(&thegame, &Client, seconds);
         Render(&thegame);
     }
@@ -94,7 +91,6 @@ void OuterLoop(const char* ServerAddress)
 		seconds = updateTime();
 		in.ProcessInputs();
 		HandleInputs(events, &thegame, &thegame.gih);
-        //Input(&InputData);
         RunFrame(&thegame, &Client, seconds);
         Render(&thegame);
     }

@@ -69,7 +69,8 @@ void InputProcessor::ProcessInputs()
 		if(prevKeys[k] && !Keys[k])	//if key was pressed last frame, but let up this frame,
 		{
 			bool shift = Keys[DIK_LSHIFT] || Keys[DIK_RSHIFT];
-			events.push_back(TranslateKeyboardEvent(k, shift));
+			if(!(k == DIK_LSHIFT || k == DIK_RSHIFT || k == DIK_CAPITAL))	//we don't need to process shift key events, just skip them if they occur
+				events.push_back(TranslateKeyboardEvent(k, shift));
 		}
 	}
 	
@@ -88,28 +89,13 @@ InputEvent InputProcessor::TranslateKeyboardEvent(short code, bool shift)
 		break;
 	case DIK_BACK:
 		return InputEvent(keyboard, (char)8, 0.0f, 0.0f);
-		/*if(thegame->typing)
-			if(thegame->chatString != "")
-				thegame->chatString = thegame->chatString.substr(0, thegame->chatString.size() - 1);*/
 		break;
 	case DIK_TAB:
 		return InputEvent(keyboard, (char)9, 0.0f, 0.0f);
-		//thegame->typing = !thegame->typing;
 		break;
 	case DIK_RETURN:
 	case DIK_NUMPADENTER:
 		return InputEvent(keyboard, (char)10, 0.0f, 0.0f);
-		/*if(thegame->typing)
-		{
-			thegame->messages.AddMessage(thegame->chatString, 1.0f);
-			thegame->chatString = "";
-			thegame->typing = false;
-		}*/
-		break;
-	case DIK_LSHIFT://we don't need to process shift key events, just skip them if they occur
-	case DIK_RSHIFT://we're only interested in instantaneous shift key presses
-	case DIK_CAPITAL:
-		break;
 		break;
 	case DIK_DIVIDE:
 		return InputEvent(keyboard, '/', 0.0f, 0.0f);
@@ -117,31 +103,8 @@ InputEvent InputProcessor::TranslateKeyboardEvent(short code, bool shift)
 	default:
 		char c = characterMap[(shift? code + 0x52:code)];
 		return InputEvent(keyboard, c, 0.0f, 0.0f);
-		/*if(thegame->typing)
-		{
-			if(caps && isalpha(c))
-				c = toupper(c);
-			thegame->chatString += c;
-		}
-		else
-		{
-			switch(c)
-			{
-			case 'g':
-				break;
-			case 'b':
-				break;
-			case 'w':
-				break;
-			case 't':
-				break;
-			default:
-				break;
-			}
-		}*/
 		break;
 	}
-	return InputEvent(keyboard, (char)27, 0.0f, 0.0f);
 }
 
 list<InputEvent>* InputProcessor::getEvents()

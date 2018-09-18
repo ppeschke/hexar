@@ -41,7 +41,7 @@ void GetKeys(BYTE* KeyState)
 
     dinkeyboard->GetDeviceState(256, (LPVOID)KeyState);
 
-    for(int Index = 0; Index < 256; Index++)
+    for(int Index = 0; Index < 256; ++Index)
         *(KeyState + Index) &= 0x80;
 
     return;
