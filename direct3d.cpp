@@ -13,6 +13,8 @@ D3DPRESENT_PARAMETERS d3dpp;
 LPD3DXSPRITE d3dspt;
 LPD3DXFONT dxfont;
 LPD3DXFONT dxfontpeschkes;
+LPD3DXSPRITE ddraw;
+LPDIRECT3DTEXTURE9 chatWindow;
 
 //direct3d.cpp prototypes
 void InitDirect3D(GAMEWINDOW* gw);
@@ -25,6 +27,9 @@ void AdjustCamera(float x, float y, float z);
 void DrawModel(MODEL* Model, float x, float y, float z, float scale, float rotation, color c);
 void InitLight();
 void drawChat(string msg);
+void DrawSprite(LPDIRECT3DTEXTURE9 s, int x, int y);
+void StartSpriteRender();
+void EndSpriteRender();
 
 // include the Direct3D Library files so you don't have to put them in the project settings
 //(the paths to these do have to be included in the lib directories for the compiler though)
@@ -56,10 +61,12 @@ void InitDirect3D(GAMEWINDOW* gw)
 	D3DXCreateFont(d3ddev, 28, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
 		DEFAULT_QUALITY, DEFAULT_PITCH || FF_DONTCARE, L"Arial", &dxfontpeschkes);
 
+	D3DXCreateSprite(d3ddev, &ddraw);
+
     d3ddev->SetRenderState(D3DRS_LIGHTING, TRUE);
     d3ddev->SetRenderState(D3DRS_ZENABLE, TRUE);
 	d3ddev->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);    // handle normals in scaling
-
+	D3DXCreateTextureFromFile(d3ddev, L"chatwindow.png", &chatWindow);
     return;
 }
 
@@ -262,8 +269,26 @@ void drawTextAt(const char* text, RECT* textbox)
 
 void drawChat(string msg)
 {
-	static RECT textbox{ 0, 576, 341, 1024 };
+	static RECT textbox{ 10, 586, 341, 1024 };
+	StartSpriteRender();
+	DrawSprite(chatWindow, 0, 576);
+	EndSpriteRender();
 	dxfont->DrawTextA(NULL, msg.c_str(), msg.size(), &textbox, DT_LEFT | DT_TOP | DT_WORDBREAK, D3DCOLOR_ARGB(255, 255, 255, 0));
+}
+
+void DrawSprite(LPDIRECT3DTEXTURE9 s, int x, int y)
+{
+	HRESULT hr = ddraw->Draw(s, NULL, &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3((float)x, (float)y, 0.0f), D3DCOLOR_XRGB(255, 255, 255));
+	//s->sprite	is the sprite to draw
+	//NULL tells it to draw the whole stinkin' thing (would normally be a pRECT
+	//D3DXVECTOR3 is the center point (just setting it to (0, 0)
+	//the second D3DVECTOR3 is the point to start drawing it on the screen
+	//the color is to draw at full intensity
+	/*HRESULT Draw(LPDIRECT3DTEXTURE9 pTexture,
+			 CONST RECT* pSrcRect,
+			 CONST D3DXVECTOR3* pCenter,
+			 CONST D3DXVECTOR3* pPosition,
+			 D3DCOLOR Color);*/
 }
 
 void drawPeschkes(const char* peschkes)
@@ -272,4 +297,15 @@ void drawPeschkes(const char* peschkes)
 	SetRect(&textbox, 224, 700, 1014, 758);
 	dxfontpeschkes->DrawTextA(NULL, peschkes, strlen(peschkes), &textbox, DT_RIGHT | DT_BOTTOM,
 					  D3DCOLOR_ARGB(255, 255, 255, 255));
+}
+
+void StartSpriteRender()
+{
+	//ddraw->Begin(NULL);
+	ddraw->Begin(D3DXSPRITE_ALPHABLEND);		// begin sprite drawing with transparency
+}
+
+void EndSpriteRender()
+{
+	ddraw->End();
 }
