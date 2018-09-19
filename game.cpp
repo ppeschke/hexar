@@ -6,7 +6,6 @@ Game::Game(NetworkClient* c) : mih(this, c), gih(this, c)
 	over = false;
 	setup = false;
 	typing = false;
-	buttonTimer = 0;
 	sel1 = NULL;
 	sel2 = NULL;
 	command = ' ';

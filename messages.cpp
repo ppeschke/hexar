@@ -3,7 +3,6 @@
 
 action parseMessage(Game* thegame, string b)
 {
-	thegame->messages.AddMessage(b, 5);
 	action a;
 	int index = b.find(" ");
 	int index2;

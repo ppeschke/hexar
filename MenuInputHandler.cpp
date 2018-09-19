@@ -19,7 +19,6 @@ void MenuInputHandler::handleMouseClick(InputEvent e)
 {
 	int i, p;
 	base* sel1 = nullptr;
-	thegame->buttonTimer = 10;
 	if (getHovered(thegame, i, p))
 	{
 		sel1 = getHexagon(thegame, i, p);

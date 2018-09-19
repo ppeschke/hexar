@@ -27,7 +27,6 @@ public:
 	color playercolors[6];
 	color playerColor;
 	base* arrow;
-	int buttonTimer;
 	base* sel1;
 	base* sel2;
 	char command;
