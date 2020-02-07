@@ -1,5 +1,6 @@
 #include <fstream>
 #include "NetworkClient.h"
+#include <Ws2tcpip.h>
 
 #pragma comment(lib, "Ws2_32.lib")
 
@@ -7,26 +8,36 @@ ofstream fout;
 
 NetworkClient::NetworkClient(const char* serverAddress)
 {
-	fout.open("networkClient.log", ios::out);
+	SizeInt = sizeof(ServerAddress);
 	strcpy_s(serverIP, serverAddress);
 	port = 17000;
-	SizeInt = sizeof(ServerAddress);
-	WSAStartup(MAKEWORD(2, 2), &Winsock);
-	running = true;
-	if(LOBYTE(Winsock.wVersion) != 2 || HIBYTE(Winsock.wVersion) != 2)
+	fout.open("networkClient.log", ios::out);
+	fout << "Initializing WinSock..." << endl;
+	if (WSAStartup(MAKEWORD(2, 2), &Winsock) != 0)
 	{
+		fout << "Winsock intialization failed: " << WSAGetLastError() << endl;
 		WSACleanup();
-		exit(EXIT_FAILURE);
+		return;
+	}
+	fout << "Initialized." << endl;
+	
+	if (SOCKET_ERROR == (Socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)))
+	{
+		fout << "Failed to create socket: " << WSAGetLastError() << endl;
+		WSACleanup();
+		return;
 	}
 
-	Socket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-
-	ZeroMemory(&ServerAddress, SizeInt);
+	memset(&ServerAddress, 0, sizeof(ServerAddress));
 	ServerAddress.sin_family = AF_INET;
-	ServerAddress.sin_addr.s_addr = inet_addr(serverIP);
-	u_short IpnetShort;
-	WSAHtons(Socket, port, &IpnetShort);
-	ServerAddress.sin_port = IpnetShort;
+	ServerAddress.sin_port = htons(port);
+	if (InetPton(AF_INET, serverIP, &ServerAddress.sin_addr.S_un.S_addr) != 1)
+	{
+		fout << "Failed to create inet address." << endl;
+		WSACleanup();
+		return;
+	}
+	running = true;
 
 	connected = false;
 	ListenThreadHandle = CreateThread(NULL, 0, RecvThread, this, 0, NULL);

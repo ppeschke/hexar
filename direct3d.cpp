@@ -57,16 +57,16 @@ void InitDirect3D(GAMEWINDOW* gw)
                                 &d3dpp,
                                 &d3ddev);
 	D3DXCreateFont(d3ddev, 20, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
-               DEFAULT_QUALITY, DEFAULT_PITCH || FF_DONTCARE, L"Arial", &dxfont);
+               DEFAULT_QUALITY, DEFAULT_PITCH || FF_DONTCARE, (LPCSTR)"Arial", &dxfont);
 	D3DXCreateFont(d3ddev, 28, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
-		DEFAULT_QUALITY, DEFAULT_PITCH || FF_DONTCARE, L"Arial", &dxfontpeschkes);
+		DEFAULT_QUALITY, DEFAULT_PITCH || FF_DONTCARE, (LPCSTR)"Arial", &dxfontpeschkes);
 
 	D3DXCreateSprite(d3ddev, &ddraw);
 
     d3ddev->SetRenderState(D3DRS_LIGHTING, TRUE);
     d3ddev->SetRenderState(D3DRS_ZENABLE, TRUE);
 	d3ddev->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);    // handle normals in scaling
-	D3DXCreateTextureFromFile(d3ddev, L"chatwindow.png", &chatWindow);
+	D3DXCreateTextureFromFile(d3ddev, (LPCSTR)"chatwindow.png", &chatWindow);
     return;
 }
 
@@ -127,7 +127,7 @@ void LoadModel(MODEL* Model, LPCTSTR File, int num)
 
         USES_CONVERSION;
         if(FAILED(D3DXCreateTextureFromFile(d3ddev,
-                                            CA2W(tempMaterials[index].pTextureFilename),
+                                            tempMaterials[index].pTextureFilename,
                                             &Model->Texture[index])))
             Model->Texture[index] = NULL;
     }
