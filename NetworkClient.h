@@ -16,24 +16,24 @@ public:
 	~NetworkClient();
 
 	void Listen();
+	int RecvWithTimeout(long sec);
 	void Knock();
 	void Send(const char* message);
 	bool Connected();
 	void Leave();
 
-	mutex locker;
-	HANDLE ListenThreadHandle;
-	char serverIP[17];
-	unsigned int port;
-	WSADATA Winsock;
-	SOCKET Socket;
-	sockaddr_in ServerAddress;
-	int SizeInt;
-	char recvBuffer[256];
-	char sendBuffer[256];
-	volatile bool running;
-	list<string> messages;
-	volatile bool connected;
+	mutex			locker;
+	HANDLE			ListenThreadHandle;
+	char			serverIP[17];
+	unsigned int	port;
+	WSADATA			Winsock;
+	SOCKET			Socket;
+	sockaddr_in		ServerAddress;
+	char			recvBuffer[256];
+	char			sendBuffer[256];
+	list<string>	messages;
+	volatile bool	running;
+	volatile bool	connected;
 };
 
 #endif

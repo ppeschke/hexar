@@ -12,7 +12,7 @@ using namespace std;
 #include "turret.h"
 
 //global variables
-ofstream debugFile("debug.txt");
+//ofstream debugFile("debug.txt");
 
 action parseMessage(Game* thegame, string buffer);
 void doAction(Game* thegame, action);

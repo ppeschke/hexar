@@ -18,10 +18,17 @@ NetworkClient* theClient;
 // The Outer Loop
 void OuterLoop(const char* ServerAddress)
 {
+	unsigned int reconnectAttempts;
 	NetworkClient Client(ServerAddress);
 	theClient = &Client;
 	Game thegame(&Client);
 	thegame.logFile.open("log.txt");
+
+	if (theClient->Connected() == false)
+	{
+		thegame.logFile << "Could not connect to server. Game shutting down." << endl;
+		return;
+	}
 	InputProcessor in(&thegame);
 	list<InputEvent>* events = in.getEvents();
 	LoadGraphics(&thegame);
@@ -38,7 +45,7 @@ void OuterLoop(const char* ServerAddress)
 		in.ProcessInputs();
 		HandleInputs(events, &thegame, &thegame.mih);
 		thegame.messages.Run(seconds);
-		if((connectionAttemptTimer - 3.0f) >= prev)	//it's been more than a second
+		if((connectionAttemptTimer - 3.0f) >= prev)	//it's been more than three seconds
 		{
 			prev = connectionAttemptTimer;
 			//output message connecting to server
