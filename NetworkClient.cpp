@@ -12,7 +12,12 @@ float updateTime();
 
 NetworkClient::NetworkClient(const char* serverAddress)
 {
-	strcpy_s(serverIP, serverAddress);
+	size_t charsCopied;
+	if (0 != mbstowcs_s(&charsCopied, serverIP, 17, serverAddress, strlen(serverAddress)))
+	{
+		fout << "Error copying server address to network setup function." << endl;
+		return;
+	}
 	port = 17000;
 	fout.open("networkClient.log", ios::out);
 	fout << "Initializing WinSock..." << endl;

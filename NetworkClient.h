@@ -24,7 +24,7 @@ public:
 
 	mutex			locker;
 	HANDLE			ListenThreadHandle;
-	char			serverIP[17];
+	wchar_t			serverIP[17];
 	unsigned int	port;
 	WSADATA			Winsock;
 	SOCKET			Socket;

@@ -57,16 +57,16 @@ void InitDirect3D(GAMEWINDOW* gw)
                                 &d3dpp,
                                 &d3ddev);
 	D3DXCreateFont(d3ddev, 20, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
-               DEFAULT_QUALITY, DEFAULT_PITCH || FF_DONTCARE, (LPCSTR)"Arial", &dxfont);
+               DEFAULT_QUALITY, DEFAULT_PITCH || FF_DONTCARE, (LPCWSTR)"Arial", &dxfont);
 	D3DXCreateFont(d3ddev, 28, 0, FW_NORMAL, 1, FALSE, DEFAULT_CHARSET, OUT_DEFAULT_PRECIS,
-		DEFAULT_QUALITY, DEFAULT_PITCH || FF_DONTCARE, (LPCSTR)"Arial", &dxfontpeschkes);
+		DEFAULT_QUALITY, DEFAULT_PITCH || FF_DONTCARE, (LPCWSTR)"Arial", &dxfontpeschkes);
 
 	D3DXCreateSprite(d3ddev, &ddraw);
 
     d3ddev->SetRenderState(D3DRS_LIGHTING, TRUE);
     d3ddev->SetRenderState(D3DRS_ZENABLE, TRUE);
 	d3ddev->SetRenderState(D3DRS_NORMALIZENORMALS, TRUE);    // handle normals in scaling
-	D3DXCreateTextureFromFile(d3ddev, (LPCSTR)"chatwindow.png", &chatWindow);
+	D3DXCreateTextureFromFile(d3ddev, (LPCWSTR)"chatwindow.png", &chatWindow);
     return;
 }
 
@@ -127,7 +127,7 @@ void LoadModel(MODEL* Model, LPCTSTR File, int num)
 
         USES_CONVERSION;
         if(FAILED(D3DXCreateTextureFromFile(d3ddev,
-                                            tempMaterials[index].pTextureFilename,
+                                            (LPCWSTR)tempMaterials[index].pTextureFilename,
                                             &Model->Texture[index])))
             Model->Texture[index] = NULL;
     }
@@ -154,11 +154,14 @@ void SetCamera()
 void AdjustCamera(float x, float y, float z)
 {
     D3DXMATRIX matView;
+	D3DXVECTOR3 camPos(x, y, z);
+	D3DXVECTOR3	lookPos(0.0f, 0.0f, 0.0f);
+	D3DXVECTOR3 upPos(0.0f, 1.0f, 0.0f);
 
     D3DXMatrixLookAtLH(&matView,
-                       &D3DXVECTOR3 (x, y, z),
-                       &D3DXVECTOR3 (0.0f, 0.0f, 0.0f),
-                       &D3DXVECTOR3 (0.0f, 1.0f, 0.0f));
+                       &camPos,
+                       &lookPos,
+                       &upPos);
 
     d3ddev->SetTransform(D3DTS_VIEW, &matView);
 
@@ -174,7 +177,8 @@ void DrawModel(MODEL* Model, float x, float y, float z, float scale, float rotat
 	D3DXMatrixTranslation(&matTranslate, x, y, z);
 	D3DXMatrixRotationY(&matRotateY, rotation);
 	D3DXMatrixScaling(&matScale, scale, scale, scale);
-    d3ddev->SetTransform(D3DTS_WORLD, &(matScale * matRotateY * matTranslate));
+	D3DMATRIX matFinal = (matScale * matRotateY * matTranslate);
+    d3ddev->SetTransform(D3DTS_WORLD, &matFinal);
 	D3DMATERIAL9* tempMaterial = Model->Material;
 	switch(c)
 	{
@@ -278,7 +282,9 @@ void drawChat(string msg)
 
 void DrawSprite(LPDIRECT3DTEXTURE9 s, int x, int y)
 {
-	HRESULT hr = ddraw->Draw(s, NULL, &D3DXVECTOR3(0.0f, 0.0f, 0.0f), &D3DXVECTOR3((float)x, (float)y, 0.0f), D3DCOLOR_XRGB(255, 255, 255));
+	D3DXVECTOR3 vecZero(0.0f, 0.0f, 0.0f);
+	D3DXVECTOR3 vecXY((float)x, (float)y, 0.0f);
+	HRESULT hr = ddraw->Draw(s, NULL, &vecZero, &vecXY, D3DCOLOR_XRGB(255, 255, 255));
 	//s->sprite	is the sprite to draw
 	//NULL tells it to draw the whole stinkin' thing (would normally be a pRECT
 	//D3DXVECTOR3 is the center point (just setting it to (0, 0)
